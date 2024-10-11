@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<Window
+<windowex:WindowEx
     x:Class="OutputBrowser.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -7,6 +7,9 @@
     xmlns:local="using:OutputBrowser"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:pages="using:OutputBrowser.Pages"
+    xmlns:windowex="using:WinUIEx"
     mc:Ignorable="d">
-    <pages:ShellPage />
-</Window>
+    <Window.SystemBackdrop>
+        <DesktopAcrylicBackdrop />
+    </Window.SystemBackdrop>
+</windowex:WindowEx>

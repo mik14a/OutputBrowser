@@ -1,7 +1,10 @@
 using Microsoft.UI.Xaml;
+using WinUIEx;
 
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
+#if !DEBUG
+using System;
+using System.IO;
+#endif
 
 namespace OutputBrowser;
 
@@ -16,6 +19,9 @@ public partial class App : Application
     /// </summary>
     public App() {
         InitializeComponent();
+#if !DEBUG
+        UnhandledException += AppUnhandledException;
+#endif
     }
 
     /// <summary>
@@ -23,9 +29,32 @@ public partial class App : Application
     /// </summary>
     /// <param name="args">Details about the launch request and process.</param>
     protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args) {
-        m_window = new MainWindow();
-        m_window.Activate();
+        _window = new MainWindow {
+            MinWidth = 320, MinHeight = 240,
+            Content = new Pages.ShellPage(),
+            ExtendsContentIntoTitleBar = true
+        };
+        var shell = (Pages.ShellPage)_window.Content;
+        _window.SetTitleBar(shell.AppTitleBar);
+        _window.SetWindowSize(800, 600);
+        _window.Activate();
     }
 
-    Window m_window;
+#if !DEBUG
+    void AppUnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e) {
+        e.Handled = true;
+        try {
+            var exceptionText = $"Unhandled Exception: {e.Exception}\n\nStack Trace:\n{e.Exception.StackTrace}";
+            var fileName = $"OutputBrowser.UnhandledException_{DateTime.Now:yyyyMMdd_HHmmssfff}.txt";
+            var documentFolder = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+            var filePath = Path.Combine(documentFolder, fileName);
+            File.WriteAllText(filePath, exceptionText);
+            System.Diagnostics.Debug.WriteLine($"Exception saved to: {filePath}");
+        } catch (Exception ex) {
+            System.Diagnostics.Debug.WriteLine($"Failed to save exception: {ex}");
+        }
+    }
+#endif
+
+    MainWindow _window;
 }

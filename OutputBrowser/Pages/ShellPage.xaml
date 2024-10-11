@@ -8,5 +8,36 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:pages="using:OutputBrowser.Pages"
     mc:Ignorable="d">
-    <pages:OutputPage />
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Border
+            x:Name="_AppTitleBar"
+            Height="{Binding ElementName=_NavigationView, Path=CompactPaneLength}"
+            Margin="48,0,0,0"
+            VerticalAlignment="Stretch"
+            AutomationProperties.AutomationId="AppTitleBar"
+            Canvas.ZIndex="1"
+            IsHitTestVisible="True">
+            <TextBlock
+                Margin="12,0"
+                VerticalAlignment="Center"
+                Style="{StaticResource CaptionTextBlockStyle}"
+                Text="OutputBrowser" />
+        </Border>
+        <NavigationView
+            x:Name="_NavigationView"
+            Grid.RowSpan="2"
+            IsBackButtonVisible="Collapsed"
+            IsTabStop="False"
+            PaneDisplayMode="LeftMinimal">
+            <pages:OutputPage Margin="0,47,0,0" />
+        </NavigationView>
+
+    </Grid>
+
 </Page>
