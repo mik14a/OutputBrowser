@@ -12,6 +12,10 @@
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
     <DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_BREAK_ON_UNHANDLED_EXCEPTION;</DefineConstants>
   </PropertyGroup>
+  <ItemGroup>
+    <None Remove="Pages\OutputPage.xaml" />
+    <None Remove="Pages\ShellPage.xaml" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.1" />
@@ -30,4 +34,11 @@
     <PackageReference Include="Tomlyn.Extensions.Configuration" Version="1.0.6" />
     <Manifest Include="$(ApplicationManifest)" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Pages\OutputPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
 </Project>
