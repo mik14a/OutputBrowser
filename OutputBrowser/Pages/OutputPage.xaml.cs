@@ -4,6 +4,7 @@ using System.IO;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using OutputBrowser.ViewModels;
 using Windows.ApplicationModel.DataTransfer;
@@ -21,7 +22,7 @@ namespace OutputBrowser.Pages
     {
         public ObservableCollection<OutputViewModel> Outputs { get; } = [];
 
-        [ObservableProperty] string _imagePath = null;
+        [ObservableProperty] string _imagePath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
 
         public OutputPage() {
             _watcher.Created += WatcherEvent;
@@ -30,6 +31,12 @@ namespace OutputBrowser.Pages
             _watcher.Renamed += WatcherEvent;
             InitializeComponent();
             DataContext = this;
+
+            Loaded += PageLoaded;
+            void PageLoaded(object sender, RoutedEventArgs e) {
+                Loaded -= PageLoaded;
+                DispatcherQueue.TryEnqueue(() => _Outputs.Focus(FocusState.Programmatic));
+            }
         }
 
         [RelayCommand]
@@ -58,6 +65,20 @@ namespace OutputBrowser.Pages
             Clipboard.SetContent(dataPackage);
         }
 
+        [RelayCommand]
+        static void CopyPath(OutputViewModel output) {
+            var dataPackage = new DataPackage();
+            dataPackage.SetText(output.ImagePath);
+            Clipboard.SetContent(dataPackage);
+        }
+
+        [RelayCommand]
+        static void CopyPrompt(OutputViewModel output) {
+            var dataPackage = new DataPackage();
+            dataPackage.SetText(output.ContactInfo);
+            Clipboard.SetContent(dataPackage);
+        }
+
         partial void OnImagePathChanged(string value) {
             if (!string.IsNullOrWhiteSpace(value) && Directory.Exists(value)) {
                 _watcher.Path = value;
@@ -69,8 +90,14 @@ namespace OutputBrowser.Pages
         void WatcherEvent(object sender, FileSystemEventArgs e) {
             var fullPath = e.FullPath;
             if (Path.GetExtension(fullPath) == ".png") {
-                DispatcherQueue.TryEnqueue(() => Outputs.Add(new OutputViewModel(fullPath)));
+                DispatcherQueue.TryEnqueue(async () => await AddOutput(fullPath));
             }
+        }
+
+        async Task AddOutput(string path) {
+            var output = new OutputViewModel(ImagePath, path);
+            Outputs.Add(output);
+            await output.InitializeAsync();
         }
 
         readonly FileSystemWatcher _watcher = new() {

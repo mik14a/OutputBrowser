@@ -14,6 +14,7 @@
 
     <Page.Resources>
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <converters:FileSizeToFriendlyStringConverter x:Key="FileSizeToFriendlyStringConverter" />
 
         <DataTemplate x:Key="OutputDataTemplate" x:DataType="viewmodels:OutputViewModel">
             <Grid>
@@ -21,7 +22,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition />
                 </Grid.RowDefinitions>
-                <TextBlock Grid.Row="0" Text="{x:Bind ImagePath}" />
+                <TextBlock Grid.Row="0" Text="{x:Bind DisplayName}" />
                 <Border Grid.Row="1" CornerRadius="8,8,8,8">
                     <Border.ContextFlyout>
                         <CommandBarFlyout>
@@ -29,7 +30,7 @@
                                 Command="{Binding ElementName=_Page, Path=OpenFolderCommand}"
                                 CommandParameter="{x:Bind}"
                                 Icon="Folder"
-                                Label="画像フォルダ" />
+                                Label="画像フォルダを開く" />
                             <AppBarButton
                                 Command="{Binding ElementName=_Page, Path=CopyCommand}"
                                 CommandParameter="{x:Bind}"
@@ -41,6 +42,16 @@
                                 Icon="Pictures"
                                 Label="画像をコピー" />
                             <CommandBarFlyout.SecondaryCommands>
+                                <AppBarButton
+                                    Command="{Binding ElementName=_Page, Path=CopyPathCommand}"
+                                    CommandParameter="{x:Bind}"
+                                    Icon="Bookmarks"
+                                    Label="パスのコピー" />
+                                <AppBarButton
+                                    Command="{Binding ElementName=_Page, Path=CopyPromptCommand}"
+                                    CommandParameter="{x:Bind}"
+                                    Icon="Page2"
+                                    Label="プロンプトのコピー" />
                                 <AppBarToggleButton
                                     x:Name="_ContactInfo"
                                     Icon="ContactInfo"
@@ -49,15 +60,52 @@
                             </CommandBarFlyout.SecondaryCommands>
                         </CommandBarFlyout>
                     </Border.ContextFlyout>
+                    <!--<ToolTipService.ToolTip>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock
+                                Grid.Row="0"
+                                Grid.Column="0"
+                                Text="ファイル名" />
+                            <TextBlock
+                                Grid.Row="0"
+                                Grid.Column="1"
+                                Text="{x:Bind FileName}" />
+                            <TextBlock
+                                Grid.Row="1"
+                                Grid.Column="0"
+                                Text="ファイルサイズ" />
+                            <TextBlock
+                                Grid.Row="1"
+                                Grid.Column="1"
+                                Text="{x:Bind Size, Converter={StaticResource FileSizeToFriendlyStringConverter}}" />
+                            <TextBlock
+                                Grid.Row="2"
+                                Grid.Column="0"
+                                Text="最終更新日" />
+                            <TextBlock
+                                Grid.Row="2"
+                                Grid.Column="1"
+                                Text="{x:Bind DateModified}" />
+                        </Grid>
+                    </ToolTipService.ToolTip>-->
                     <Grid>
-                        <Image Source="{x:Bind Image}" />
+                        <Image Source="{x:Bind Image, Mode=OneWay}" />
                         <Border
                             VerticalAlignment="Bottom"
                             Background="{StaticResource ContentDialogLightDismissOverlayBackground}"
                             CornerRadius="0,0,8,8">
                             <TextBlock
                                 Margin="{StaticResource ContentDialogPadding}"
-                                Text="{x:Bind ContactInfo}"
+                                Text="{x:Bind ContactInfo, Mode=OneWay}"
                                 Visibility="{x:Bind VisibleContactInfo, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
                         </Border>
                     </Grid>
@@ -73,8 +121,9 @@
         </Grid.RowDefinitions>
         <TextBox Text="{x:Bind ImagePath, Mode=TwoWay}" />
         <ListView
-            x:Name="_Messages"
+            x:Name="_Outputs"
             Grid.Row="1"
+            Margin="0,8"
             ItemTemplate="{StaticResource OutputDataTemplate}"
             ItemsSource="{x:Bind Outputs}"
             SelectionMode="None">

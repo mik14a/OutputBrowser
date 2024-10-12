@@ -1,8 +1,10 @@
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
+using Microsoft.VisualBasic;
 using Windows.Graphics.Imaging;
 using Windows.Storage;
 
@@ -10,46 +12,36 @@ namespace OutputBrowser.ViewModels
 {
     public partial class OutputViewModel : ObservableRecipient
     {
-        [ObservableProperty] string _imagePath = null;
+        public string ImagePath { get; }
+        public string FileName { get; }
+        public string DisplayName { get; }
+        public DateTime DateModified { get; }
+        public long Size { get; }
+
         [ObservableProperty] bool _visibleContactInfo = false;
-        public ImageSource Image => _image ??= CreateImage();
-        public string ContactInfo => _contactInfo ?? GetContactInfo();
+        [ObservableProperty] ImageSource _image;
+        [ObservableProperty] string _contactInfo;
 
-        public OutputViewModel(string path) {
-            _imagePath = path;
+        public OutputViewModel(string basePath, string fullPath) {
+            ImagePath = fullPath;
+            FileName = Path.GetFileName(fullPath);
+            DisplayName = Path.GetRelativePath(basePath, fullPath);
+            var fileInfo = new FileInfo(fullPath);
+            DateModified = fileInfo.LastWriteTime;
+            Size = fileInfo.Length;
         }
 
-        BitmapSource CreateImage() {
-            return !string.IsNullOrEmpty(ImagePath) && File.Exists(ImagePath)
-                ? CreateImage(ImagePath)
-                : null;
-
-            static BitmapImage CreateImage(string path) {
-                var bitmap = new BitmapImage();
-                var file = StorageFile.GetFileFromPathAsync(path).GetAwaiter().GetResult();
-                using var stream = file.OpenAsync(FileAccessMode.Read).GetAwaiter().GetResult();
-                bitmap.SetSource(stream);
-                return bitmap;
-            }
+        public async Task InitializeAsync() {
+            var file = await StorageFile.GetFileFromPathAsync(ImagePath);
+            using var stream = await file.OpenAsync(FileAccessMode.Read);
+            var bitmap = new BitmapImage();
+            await bitmap.SetSourceAsync(stream);
+            Image = bitmap;
+            var decoder = await BitmapDecoder.CreateAsync(stream);
+            const string Parameters = "/tEXt/{str=parameters}";
+            var retrieveProperties = await decoder.BitmapProperties.GetPropertiesAsync([Parameters]);
+            retrieveProperties.TryGetValue(Parameters, out var parameters);
+            ContactInfo = (string)parameters?.Value;
         }
-
-        string GetContactInfo() {
-            return !string.IsNullOrEmpty(ImagePath) && File.Exists(ImagePath)
-                ? GetContactInfo(ImagePath)
-                : null;
-
-            static string GetContactInfo(string path) {
-                var file = StorageFile.GetFileFromPathAsync(path).GetAwaiter().GetResult();
-                using var stream = file.OpenAsync(FileAccessMode.Read).GetAwaiter().GetResult();
-                var decoder = BitmapDecoder.CreateAsync(stream).GetAwaiter().GetResult();
-                var retrieveProperties = decoder.BitmapProperties.GetPropertiesAsync(["/tEXt/{str=parameters}"]).GetAwaiter().GetResult();
-                return retrieveProperties.TryGetValue("/tEXt/{str=parameters}", out var parameters)
-                    ? (string)parameters.Value
-                    : null;
-            }
-        }
-
-        ImageSource _image = null;
-        readonly string _contactInfo = null;
     }
 }
