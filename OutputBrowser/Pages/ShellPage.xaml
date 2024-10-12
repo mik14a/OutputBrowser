@@ -23,11 +23,17 @@
             AutomationProperties.AutomationId="AppTitleBar"
             Canvas.ZIndex="1"
             IsHitTestVisible="True">
-            <TextBlock
-                Margin="12,0"
-                VerticalAlignment="Center"
-                Style="{StaticResource CaptionTextBlockStyle}"
-                Text="OutputBrowser" />
+            <StackPanel VerticalAlignment="Stretch" Orientation="Horizontal">
+                <Image
+                    Width="32"
+                    VerticalAlignment="Center"
+                    Source="ms-appx:///Assets/Tiles/TitlebarLogo.png" />
+                <TextBlock
+                    Margin="12,0"
+                    VerticalAlignment="Center"
+                    Style="{StaticResource CaptionTextBlockStyle}"
+                    Text="OutputBrowser" />
+            </StackPanel>
         </Border>
         <NavigationView
             x:Name="_NavigationView"

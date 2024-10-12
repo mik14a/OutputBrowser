@@ -11,11 +11,8 @@
     <UseWinUI>true</UseWinUI>
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
     <DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_BREAK_ON_UNHANDLED_EXCEPTION;</DefineConstants>
+    <ApplicationIcon>Assets\Tiles\OutputBrowser.ico</ApplicationIcon>
   </PropertyGroup>
-  <ItemGroup>
-    <None Remove="Pages\OutputPage.xaml" />
-    <None Remove="Pages\ShellPage.xaml" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.1" />
@@ -36,9 +33,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Page Update="Pages\OutputPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
+    <Content Include="Assets\Tiles\OutputBrowser.ico" />
+    <Content Include="Assets\Tiles\TitlebarLogo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>
