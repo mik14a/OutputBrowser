@@ -3,14 +3,18 @@
     x:Class="OutputBrowser.Pages.OutputPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="using:CommunityToolkit.WinUI.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:OutputBrowser.Pages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewmodels="using:OutputBrowser.ViewModels"
+    x:Name="_Page"
     d:DataContext="{d:DesignInstance Type=local:OutputPage}"
     mc:Ignorable="d">
 
     <Page.Resources>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+
         <DataTemplate x:Key="OutputDataTemplate" x:DataType="viewmodels:OutputViewModel">
             <Grid>
                 <Grid.RowDefinitions>
@@ -18,7 +22,46 @@
                     <RowDefinition />
                 </Grid.RowDefinitions>
                 <TextBlock Grid.Row="0" Text="{x:Bind ImagePath}" />
-                <Image Grid.Row="1" Source="{x:Bind Image}" />
+                <Border Grid.Row="1" CornerRadius="8,8,8,8">
+                    <Border.ContextFlyout>
+                        <CommandBarFlyout>
+                            <AppBarButton
+                                Command="{Binding ElementName=_Page, Path=OpenFolderCommand}"
+                                CommandParameter="{x:Bind}"
+                                Icon="Folder"
+                                Label="画像フォルダ" />
+                            <AppBarButton
+                                Command="{Binding ElementName=_Page, Path=CopyCommand}"
+                                CommandParameter="{x:Bind}"
+                                Icon="Copy"
+                                Label="ファイルをコピー" />
+                            <AppBarButton
+                                Command="{Binding ElementName=_Page, Path=CopyImageCommand}"
+                                CommandParameter="{x:Bind}"
+                                Icon="Pictures"
+                                Label="画像をコピー" />
+                            <CommandBarFlyout.SecondaryCommands>
+                                <AppBarToggleButton
+                                    x:Name="_ContactInfo"
+                                    Icon="ContactInfo"
+                                    IsChecked="{x:Bind VisibleContactInfo, Mode=TwoWay}"
+                                    Label="プロンプトの表示" />
+                            </CommandBarFlyout.SecondaryCommands>
+                        </CommandBarFlyout>
+                    </Border.ContextFlyout>
+                    <Grid>
+                        <Image Source="{x:Bind Image}" />
+                        <Border
+                            VerticalAlignment="Bottom"
+                            Background="{StaticResource ContentDialogLightDismissOverlayBackground}"
+                            CornerRadius="0,0,8,8">
+                            <TextBlock
+                                Margin="{StaticResource ContentDialogPadding}"
+                                Text="{x:Bind ContactInfo}"
+                                Visibility="{x:Bind VisibleContactInfo, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                        </Border>
+                    </Grid>
+                </Border>
             </Grid>
         </DataTemplate>
     </Page.Resources>
@@ -28,7 +71,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
-        <TextBox Text="{x:Bind Path, Mode=TwoWay}" />
+        <TextBox Text="{x:Bind ImagePath, Mode=TwoWay}" />
         <ListView
             x:Name="_Messages"
             Grid.Row="1"
