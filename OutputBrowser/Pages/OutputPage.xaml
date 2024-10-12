@@ -119,7 +119,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
-        <TextBox Text="{x:Bind ImagePath, Mode=TwoWay}" />
+        <TextBox x:Name="_ImagePath" Text="{x:Bind ImagePath, Mode=TwoWay}" />
         <ListView
             x:Name="_Outputs"
             Grid.Row="1"

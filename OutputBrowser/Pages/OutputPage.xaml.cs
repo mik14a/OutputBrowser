@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Threading.Tasks;
@@ -18,24 +19,38 @@ namespace OutputBrowser.Pages
     /// A output page that can be used on its own or navigated to within a Frame.
     /// </summary>
     [INotifyPropertyChanged]
-    public sealed partial class OutputPage : Page
+    public sealed partial class OutputPage : Page, IDisposable
     {
         public ObservableCollection<OutputViewModel> Outputs { get; } = [];
 
         [ObservableProperty] string _imagePath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
 
         public OutputPage() {
+            if (File.Exists(App.SettingsFile)) _imagePath = File.ReadAllText(App.SettingsFile);
+            _watcher = new(_imagePath) {
+                NotifyFilter = NotifyFilters.LastWrite
+                               | NotifyFilters.FileName
+                               | NotifyFilters.DirectoryName,
+                EnableRaisingEvents = true,
+                IncludeSubdirectories = true
+            };
             _watcher.Created += WatcherEvent;
             _watcher.Changed += WatcherEvent;
             _watcher.Deleted += WatcherEvent;
             _watcher.Renamed += WatcherEvent;
+            Loaded += PageLoaded;
+            Unloaded += PageUnloaded;
+
             InitializeComponent();
             DataContext = this;
 
-            Loaded += PageLoaded;
             void PageLoaded(object sender, RoutedEventArgs e) {
                 Loaded -= PageLoaded;
-                DispatcherQueue.TryEnqueue(() => _Outputs.Focus(FocusState.Programmatic));
+                _ImagePath.Focus(FocusState.Programmatic);
+            }
+            void PageUnloaded(object sender, RoutedEventArgs e) {
+                Unloaded -= PageUnloaded;
+                File.WriteAllText(App.SettingsFile, _imagePath);
             }
         }
 
@@ -80,18 +95,16 @@ namespace OutputBrowser.Pages
         }
 
         partial void OnImagePathChanged(string value) {
-            if (!string.IsNullOrWhiteSpace(value) && Directory.Exists(value)) {
-                _watcher.Path = value;
-                _watcher.EnableRaisingEvents = true;
-                _watcher.IncludeSubdirectories = true;
-            }
+            if (string.IsNullOrWhiteSpace(value)) return;
+            if (!Directory.Exists(value)) return;
+            if (_watcher.Path == value) return;
+            _watcher.Path = value;
         }
 
         void WatcherEvent(object sender, FileSystemEventArgs e) {
-            var fullPath = e.FullPath;
-            if (Path.GetExtension(fullPath) == ".png") {
-                DispatcherQueue.TryEnqueue(async () => await AddOutput(fullPath));
-            }
+            if (!File.Exists(e.FullPath)) return;
+            if (!_extensions.Contains(Path.GetExtension(e.FullPath))) return;
+            DispatcherQueue.TryEnqueue(async () => await AddOutput(e.FullPath));
         }
 
         async Task AddOutput(string path) {
@@ -100,10 +113,12 @@ namespace OutputBrowser.Pages
             await output.InitializeAsync();
         }
 
-        readonly FileSystemWatcher _watcher = new() {
-            NotifyFilter = NotifyFilters.LastWrite
-                           | NotifyFilters.FileName
-                           | NotifyFilters.DirectoryName
-        };
+        readonly FileSystemWatcher _watcher;
+
+        public void Dispose() {
+            ((IDisposable)_watcher).Dispose();
+        }
+
+        static readonly List<string> _extensions = [".png"];
     }
 }

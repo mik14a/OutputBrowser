@@ -1,3 +1,5 @@
+using System;
+using System.IO;
 using Microsoft.UI.Xaml;
 using WinUIEx;
 
@@ -13,6 +15,8 @@ namespace OutputBrowser;
 /// </summary>
 public partial class App : Application
 {
+    public static readonly string SettingsFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".OutputBrowser");
+
     /// <summary>
     /// Initializes the singleton application object.  This is the first line of authored code
     /// executed, and as such is the logical equivalent of main() or WinMain().
@@ -36,7 +40,7 @@ public partial class App : Application
         };
         var shell = (Pages.ShellPage)_window.Content;
         _window.SetTitleBar(shell.AppTitleBar);
-        _window.SetWindowSize(800, 600);
+        _window.SetWindowSize(600, 800);
         _window.Activate();
     }
 
@@ -45,7 +49,7 @@ public partial class App : Application
         e.Handled = true;
         try {
             var exceptionText = $"Unhandled Exception: {e.Exception}\n\nStack Trace:\n{e.Exception.StackTrace}";
-            var fileName = $"OutputBrowser.UnhandledException_{DateTime.Now:yyyyMMdd_HHmmssfff}.txt";
+            var fileName = $"OutputBrowser.UnhandledException.{DateTime.Now:yyyyMMdd_HHmmssfff}.txt";
             var documentFolder = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
             var filePath = Path.Combine(documentFolder, fileName);
             File.WriteAllText(filePath, exceptionText);

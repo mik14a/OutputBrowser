@@ -8,8 +8,9 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:pages="using:OutputBrowser.Pages"
     xmlns:windowex="using:WinUIEx"
+    Title="OutputBrowser"
     mc:Ignorable="d">
     <Window.SystemBackdrop>
-        <DesktopAcrylicBackdrop />
+        <MicaBackdrop Kind="BaseAlt" />
     </Window.SystemBackdrop>
 </windowex:WindowEx>
