@@ -7,6 +7,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
 using OutputBrowser.ViewModels;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
@@ -21,9 +22,9 @@ namespace OutputBrowser.Pages
     [INotifyPropertyChanged]
     public sealed partial class OutputPage : Page, IDisposable
     {
-        public ObservableCollection<OutputViewModel> Outputs { get; } = [];
-
         [ObservableProperty] string _imagePath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+        public ObservableCollection<OutputViewModel> Outputs { get; } = [];
+        [ObservableProperty] bool _isScrolledAway;
 
         public OutputPage() {
             if (File.Exists(App.SettingsFile)) _imagePath = File.ReadAllText(App.SettingsFile);
@@ -43,6 +44,10 @@ namespace OutputBrowser.Pages
 
             InitializeComponent();
             DataContext = this;
+
+            _Outputs.Loaded += (sender, args)
+                => GetScrollViewer((ListView)sender).ViewChanged += (sender, e)
+                    => IsScrolledAway = ((ScrollViewer)sender).ScrollableHeight != ((ScrollViewer)sender).VerticalOffset;
 
             void PageLoaded(object sender, RoutedEventArgs e) {
                 Loaded -= PageLoaded;
@@ -94,6 +99,11 @@ namespace OutputBrowser.Pages
             Clipboard.SetContent(dataPackage);
         }
 
+        [RelayCommand]
+        void ScrollToBottom() {
+            ScrollToBottom(_Outputs, false);
+        }
+
         partial void OnImagePathChanged(string value) {
             if (string.IsNullOrWhiteSpace(value)) return;
             if (!Directory.Exists(value)) return;
@@ -117,6 +127,21 @@ namespace OutputBrowser.Pages
 
         public void Dispose() {
             ((IDisposable)_watcher).Dispose();
+        }
+
+        public static ScrollViewer GetScrollViewer(ListView listView) {
+            var child = VisualTreeHelper.GetChild(listView, 0);
+            for (var i = 0; i < VisualTreeHelper.GetChildrenCount(child); i++) {
+                var obj = VisualTreeHelper.GetChild(child, i);
+                if (obj is not ScrollViewer scrollViewer) continue;
+                return scrollViewer;
+            }
+            return null;
+        }
+
+        public static void ScrollToBottom(ListView listView, bool disableAnimation) {
+            var scrollViewer = GetScrollViewer(listView);
+            scrollViewer.ChangeView(0.0f, scrollViewer.ExtentHeight, 1.0f, disableAnimation);
         }
 
         static readonly List<string> _extensions = [".png"];

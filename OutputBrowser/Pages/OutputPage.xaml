@@ -105,6 +105,7 @@
                             CornerRadius="0,0,8,8">
                             <TextBlock
                                 Margin="{StaticResource ContentDialogPadding}"
+                                Style="{StaticResource BodyTextBlockStyle}"
                                 Text="{x:Bind ContactInfo, Mode=OneWay}"
                                 Visibility="{x:Bind VisibleContactInfo, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
                         </Border>
@@ -133,5 +134,14 @@
                 </ItemsPanelTemplate>
             </ListView.ItemsPanel>
         </ListView>
+        <Button
+            Grid.Row="1"
+            Margin="16"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Bottom"
+            Command="{x:Bind ScrollToBottomCommand}"
+            Visibility="{x:Bind IsScrolledAway, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+            <FontIcon Glyph="&#xE768;" />
+        </Button>
     </Grid>
 </Page>
