@@ -25,11 +25,11 @@
             IsHitTestVisible="True">
             <StackPanel VerticalAlignment="Stretch" Orientation="Horizontal">
                 <Image
-                    Width="32"
+                    Width="16"
                     VerticalAlignment="Center"
                     Source="ms-appx:///Assets/Tiles/TitlebarLogo.png" />
                 <TextBlock
-                    Margin="12,0"
+                    Margin="8,0"
                     VerticalAlignment="Center"
                     Style="{StaticResource CaptionTextBlockStyle}"
                     Text="OutputBrowser" />
