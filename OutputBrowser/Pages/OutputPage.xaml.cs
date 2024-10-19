@@ -27,7 +27,12 @@ namespace OutputBrowser.Pages
         [ObservableProperty] bool _isScrolledAway;
 
         public OutputPage() {
-            if (File.Exists(App.SettingsFile)) _imagePath = File.ReadAllText(App.SettingsFile);
+            if (File.Exists(App.SettingsFile)) {
+                var imagePath = File.ReadAllText(App.SettingsFile);
+                if (Directory.Exists(imagePath)) {
+                    _imagePath = imagePath;
+                }
+            }
             _watcher = new(_imagePath) {
                 NotifyFilter = NotifyFilters.LastWrite
                                | NotifyFilters.FileName
