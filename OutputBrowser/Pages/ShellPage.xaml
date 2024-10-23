@@ -18,7 +18,7 @@
         <Border
             x:Name="_AppTitleBar"
             Height="{Binding ElementName=_NavigationView, Path=CompactPaneLength}"
-            Margin="48,0,0,0"
+            Margin="40,0,0,0"
             VerticalAlignment="Stretch"
             AutomationProperties.AutomationId="AppTitleBar"
             Canvas.ZIndex="1"
@@ -29,7 +29,7 @@
                     VerticalAlignment="Center"
                     Source="ms-appx:///Assets/Tiles/TitlebarLogo.png" />
                 <TextBlock
-                    Margin="8,0"
+                    Margin="4,0"
                     VerticalAlignment="Center"
                     Style="{StaticResource CaptionTextBlockStyle}"
                     Text="OutputBrowser" />
