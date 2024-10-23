@@ -1,6 +1,10 @@
+setlocal
+
+set APP_DIR=D:\Apps\OutputBrowser
+
 dotnet publish -c Release -f net8.0-windows10.0.19041.0 -r win-x64 --self-contained ^
  OutputBrowser\OutputBrowser.csproj ^
- -o %USERPROFILE%\Documents\OutputBrowser\OutputBrowser ^
+ -o %APP_DIR% ^
  /p:Platform=x64 ^
  /p:PublishSingleFile=true ^
  /p:EnableMsixTooling=true ^
@@ -14,12 +18,14 @@ if errorlevel 1 (
     exit /b 1
 )
 
-start %USERPROFILE%\Documents\OutputBrowser\OutputBrowser
+start %APP_DIR%
 
-if exist %USERPROFILE%\Documents\OutputBrowser\OutputBrowser.7z (
-    del %USERPROFILE%\Documents\OutputBrowser\OutputBrowser.7z
+if exist %APP_DIR%\..\OutputBrowser.7z (
+    del %APP_DIR%\..\OutputBrowser.7z
 )
 
 start 7za a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on -mmt=%NUMBER_OF_PROCESSORS% ^
- %USERPROFILE%\Documents\OutputBrowser\OutputBrowser.7z ^
- %USERPROFILE%\Documents\OutputBrowser\OutputBrowser
+ %APP_DIR%\..\OutputBrowser.7z ^
+ %APP_DIR%\OutputBrowser.exe
+
+endlocal
