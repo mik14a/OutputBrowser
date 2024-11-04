@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -32,6 +33,19 @@ namespace OutputBrowser.ViewModels
         }
 
         public async Task InitializeAsync() {
+
+            do {
+                try {
+                    // Check if file is still being written by another process
+                    using var fileStream = new FileStream(ImagePath, FileMode.Open, FileAccess.Read);
+                    break;
+                } catch (IOException ex) {
+                    // Wait for image writing to complete
+                    Debug.WriteLine(ex.Message);
+                    await Task.Delay(100);
+                }
+            } while (true);
+
             var file = await StorageFile.GetFileFromPathAsync(ImagePath);
             using var stream = await file.OpenAsync(FileAccessMode.Read);
             var bitmap = new BitmapImage();

@@ -3,11 +3,6 @@ using System.IO;
 using Microsoft.UI.Xaml;
 using WinUIEx;
 
-#if !DEBUG
-using System;
-using System.IO;
-#endif
-
 namespace OutputBrowser;
 
 /// <summary>

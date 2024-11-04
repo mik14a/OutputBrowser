@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -123,6 +124,7 @@ namespace OutputBrowser.Pages
         }
 
         async Task AddOutput(string path) {
+            if (Outputs.Any(o => o.ImagePath == path)) return;
             var output = new OutputViewModel(ImagePath, path);
             Outputs.Add(output);
             await output.InitializeAsync();
