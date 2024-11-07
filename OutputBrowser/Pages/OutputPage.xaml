@@ -27,6 +27,11 @@
                     <Border.ContextFlyout>
                         <CommandBarFlyout>
                             <AppBarButton
+                                Command="{Binding ElementName=_Page, Path=OpenWithDefaultAppCommand}"
+                                CommandParameter="{x:Bind}"
+                                Icon="OpenFile"
+                                Label="開く" />
+                            <AppBarButton
                                 Command="{Binding ElementName=_Page, Path=OpenFolderCommand}"
                                 CommandParameter="{x:Bind}"
                                 Icon="Folder"

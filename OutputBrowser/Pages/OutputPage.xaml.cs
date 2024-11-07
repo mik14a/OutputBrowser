@@ -66,6 +66,12 @@ namespace OutputBrowser.Pages
         }
 
         [RelayCommand]
+        static async Task OpenWithDefaultAppAsync(OutputViewModel output) {
+            var imageFile = await StorageFile.GetFileFromPathAsync(output.ImagePath);
+            await Launcher.LaunchFileAsync(imageFile);
+        }
+
+        [RelayCommand]
         static async Task OpenFolderAsync(OutputViewModel output) {
             var imageFile = await StorageFile.GetFileFromPathAsync(output.ImagePath);
             var imageFolder = await StorageFolder.GetFolderFromPathAsync(Path.GetDirectoryName(output.ImagePath));
