@@ -1,18 +1,17 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media;
+using OutputBrowser.Extensions;
+using OutputBrowser.Models;
+using OutputBrowser.Services;
 using OutputBrowser.ViewModels;
-using Windows.ApplicationModel.DataTransfer;
-using Windows.Storage;
-using Windows.Storage.Streams;
 using Windows.System;
 
 namespace OutputBrowser.Pages
@@ -23,28 +22,28 @@ namespace OutputBrowser.Pages
     [INotifyPropertyChanged]
     public sealed partial class OutputPage : Page, IDisposable
     {
-        [ObservableProperty] string _imagePath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+        [ObservableProperty]
+        string _path = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+        [ObservableProperty]
+        string _filters = "*.png";
+
         public ObservableCollection<OutputViewModel> Outputs { get; } = [];
-        [ObservableProperty] bool _isScrolledAway;
+        [ObservableProperty]
+        bool _isScrolledAway;
 
         public OutputPage() {
-            if (File.Exists(App.SettingsFile)) {
-                var imagePath = File.ReadAllText(App.SettingsFile);
-                if (Directory.Exists(imagePath)) {
-                    _imagePath = imagePath;
-                }
-            }
-            _watcher = new(_imagePath) {
-                NotifyFilter = NotifyFilters.LastWrite
-                               | NotifyFilters.FileName
-                               | NotifyFilters.DirectoryName,
-                EnableRaisingEvents = true,
-                IncludeSubdirectories = true
+            var setting = File.Exists(App.SettingsFile)
+               ? JsonSerializer.Deserialize<OutputBrowserSettings>(File.ReadAllText(App.SettingsFile))?.Default
+               : new WatchSettings { Path = _path, Filters = _filters };
+
+            _path = setting.Path;
+            _filters = setting.Filters;
+            _service = new FileSystemWatchService(setting) {
+                Filters = _filters
             };
-            _watcher.Created += WatcherEvent;
-            _watcher.Changed += WatcherEvent;
-            _watcher.Deleted += WatcherEvent;
-            _watcher.Renamed += WatcherEvent;
+            _service.Changed += OnChanged;
+            _service.Deleted += OnDeleted;
+            _service.Renamed += OnRenamed;
             Loaded += PageLoaded;
             Unloaded += PageUnloaded;
 
@@ -57,11 +56,15 @@ namespace OutputBrowser.Pages
 
             void PageLoaded(object sender, RoutedEventArgs e) {
                 Loaded -= PageLoaded;
-                _ImagePath.Focus(FocusState.Programmatic);
+                _Outputs.Focus(FocusState.Programmatic);
             }
             void PageUnloaded(object sender, RoutedEventArgs e) {
                 Unloaded -= PageUnloaded;
-                File.WriteAllText(App.SettingsFile, _imagePath);
+                _service.Changed -= OnChanged;
+                _service.Deleted -= OnDeleted;
+                _service.Renamed -= OnRenamed;
+                var settings = new OutputBrowserSettings { Default = new WatchSettings { Path = _path, Filters = _filters } };
+                File.WriteAllText(App.SettingsFile, JsonSerializer.Serialize(settings));
             }
         }
 
@@ -116,47 +119,49 @@ namespace OutputBrowser.Pages
             ScrollToBottom(_Outputs, false);
         }
 
-        partial void OnImagePathChanged(string value) {
+        partial void OnPathChanged(string value) {
             if (string.IsNullOrWhiteSpace(value)) return;
             if (!Directory.Exists(value)) return;
-            if (_watcher.Path == value) return;
-            _watcher.Path = value;
+            if (_service.Path == value) return;
+            _service.Path = value;
         }
 
-        void WatcherEvent(object sender, FileSystemEventArgs e) {
-            if (!File.Exists(e.FullPath)) return;
-            if (!_extensions.Contains(Path.GetExtension(e.FullPath))) return;
-            DispatcherQueue.TryEnqueue(async () => await AddOutput(e.FullPath));
+        partial void OnFiltersChanged(string value) {
+            if (string.IsNullOrWhiteSpace(value)) return;
+            _service.Filters = value;
         }
 
-        async Task AddOutput(string path) {
-            if (Outputs.Any(o => o.ImagePath == path)) return;
-            var output = new OutputViewModel(ImagePath, path);
-            Outputs.Add(output);
-            await output.InitializeAsync();
+        void OnChanged(object sender, FileSystemEventArgs e) {
+            DispatcherQueue.TryEnqueue(async () => {
+                if (Outputs.Any(o => o.ImagePath == e.FullPath)) return;
+                var output = new OutputViewModel(Path, e.FullPath);
+                Outputs.Add(output);
+                await output.InitializeAsync();
+            });
         }
 
-        readonly FileSystemWatcher _watcher;
+        void OnDeleted(object sender, FileSystemEventArgs e) {
+            DispatcherQueue.TryEnqueue(() => {
+                var viewModel = Outputs.FirstOrDefault(o => o.ImagePath == e.FullPath);
+                if (viewModel != null) Outputs.Remove(viewModel);
+            });
+        }
+
+        void OnRenamed(object sender, RenamedEventArgs e) {
+            DispatcherQueue.TryEnqueue(async () => {
+                var viewModel = Outputs.FirstOrDefault(o => o.ImagePath == e.OldFullPath);
+                if (viewModel != null) Outputs.Remove(viewModel);
+                if (Outputs.Any(o => o.ImagePath == e.FullPath)) return;
+                var output = new OutputViewModel(Path, e.FullPath);
+                Outputs.Add(output);
+                await output.InitializeAsync();
+            });
+        }
+
+        readonly FileSystemWatchService _service;
 
         public void Dispose() {
-            ((IDisposable)_watcher).Dispose();
+            ((IDisposable)_service).Dispose();
         }
-
-        public static ScrollViewer GetScrollViewer(ListView listView) {
-            var child = VisualTreeHelper.GetChild(listView, 0);
-            for (var i = 0; i < VisualTreeHelper.GetChildrenCount(child); i++) {
-                var obj = VisualTreeHelper.GetChild(child, i);
-                if (obj is not ScrollViewer scrollViewer) continue;
-                return scrollViewer;
-            }
-            return null;
-        }
-
-        public static void ScrollToBottom(ListView listView, bool disableAnimation) {
-            var scrollViewer = GetScrollViewer(listView);
-            scrollViewer.ChangeView(0.0f, scrollViewer.ExtentHeight, 1.0f, disableAnimation);
-        }
-
-        static readonly List<string> _extensions = [".png"];
     }
 }

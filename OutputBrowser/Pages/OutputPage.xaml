@@ -22,7 +22,10 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition />
                 </Grid.RowDefinitions>
-                <TextBlock Grid.Row="0" Text="{x:Bind DisplayName}" />
+                <TextBlock
+                    Grid.Row="0"
+                    Text="{x:Bind DisplayName}"
+                    TextTrimming="CharacterEllipsis" />
                 <Border Grid.Row="1" CornerRadius="8,8,8,8">
                     <Border.ContextFlyout>
                         <CommandBarFlyout>
@@ -125,7 +128,20 @@
             <RowDefinition Height="Auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
-        <TextBox x:Name="_ImagePath" Text="{x:Bind ImagePath, Mode=TwoWay}" />
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <TextBox
+                x:Name="_Path"
+                Grid.Column="0"
+                Text="{x:Bind Path, Mode=TwoWay}" />
+            <TextBox
+                x:Name="_Filters"
+                Grid.Column="1"
+                Text="{x:Bind Filters, Mode=TwoWay}" />
+        </Grid>
         <ListView
             x:Name="_Outputs"
             Grid.Row="1"
