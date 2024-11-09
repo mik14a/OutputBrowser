@@ -51,7 +51,7 @@ namespace OutputBrowser.Pages
             DataContext = this;
 
             _Outputs.Loaded += (sender, args)
-                => GetScrollViewer((ListView)sender).ViewChanged += (sender, e)
+                => ((ListView)sender).GetScrollViewer().ViewChanged += (sender, e)
                     => IsScrolledAway = ((ScrollViewer)sender).ScrollableHeight != ((ScrollViewer)sender).VerticalOffset;
 
             void PageLoaded(object sender, RoutedEventArgs e) {
@@ -70,53 +70,37 @@ namespace OutputBrowser.Pages
 
         [RelayCommand]
         static async Task OpenWithDefaultAppAsync(OutputViewModel output) {
-            var imageFile = await StorageFile.GetFileFromPathAsync(output.ImagePath);
-            await Launcher.LaunchFileAsync(imageFile);
+            await output.OpenWithDefaultAppAsync();
         }
 
         [RelayCommand]
         static async Task OpenFolderAsync(OutputViewModel output) {
-            var imageFile = await StorageFile.GetFileFromPathAsync(output.ImagePath);
-            var imageFolder = await StorageFolder.GetFolderFromPathAsync(Path.GetDirectoryName(output.ImagePath));
-            var folderLauncherOptions = new FolderLauncherOptions();
-            folderLauncherOptions.ItemsToSelect.Add(imageFile);
-            await Launcher.LaunchFolderAsync(imageFolder, folderLauncherOptions);
+            await output.OpenFolderAsync();
         }
 
         [RelayCommand]
         static async Task CopyAsync(OutputViewModel output) {
-            var imageFile = await StorageFile.GetFileFromPathAsync(output.ImagePath);
-            var dataPackage = new DataPackage();
-            dataPackage.SetStorageItems([imageFile]);
-            Clipboard.SetContent(dataPackage);
+            await output.CopyAsync();
         }
 
         [RelayCommand]
         static async Task CopyImageAsync(OutputViewModel output) {
-            var imageFile = await StorageFile.GetFileFromPathAsync(output.ImagePath);
-            var stream = await imageFile.OpenReadAsync();
-            var dataPackage = new DataPackage();
-            dataPackage.SetBitmap(RandomAccessStreamReference.CreateFromStream(stream));
-            Clipboard.SetContent(dataPackage);
+            await output.CopyImageAsync();
         }
 
         [RelayCommand]
         static void CopyPath(OutputViewModel output) {
-            var dataPackage = new DataPackage();
-            dataPackage.SetText(output.ImagePath);
-            Clipboard.SetContent(dataPackage);
+            output.CopyPath();
         }
 
         [RelayCommand]
         static void CopyPrompt(OutputViewModel output) {
-            var dataPackage = new DataPackage();
-            dataPackage.SetText(output.ContactInfo);
-            Clipboard.SetContent(dataPackage);
+            output.CopyPrompt();
         }
 
         [RelayCommand]
         void ScrollToBottom() {
-            ScrollToBottom(_Outputs, false);
+            _Outputs.ScrollToBottom(disableAnimation: false);
         }
 
         partial void OnPathChanged(string value) {
