@@ -18,7 +18,7 @@
         <Border
             x:Name="_AppTitleBar"
             Height="{Binding ElementName=_NavigationView, Path=CompactPaneLength}"
-            Margin="40,0,0,0"
+            Margin="52,0,0,0"
             VerticalAlignment="Stretch"
             AutomationProperties.AutomationId="AppTitleBar"
             Canvas.ZIndex="1"

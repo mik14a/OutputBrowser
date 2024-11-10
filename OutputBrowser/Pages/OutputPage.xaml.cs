@@ -117,10 +117,11 @@ namespace OutputBrowser.Pages
 
         void OnChanged(object sender, FileSystemEventArgs e) {
             DispatcherQueue.TryEnqueue(async () => {
+                if (!File.Exists(e.FullPath)) return;
                 if (Outputs.Any(o => o.ImagePath == e.FullPath)) return;
                 var output = new OutputViewModel(Path, e.FullPath);
-                Outputs.Add(output);
-                await output.InitializeAsync();
+                var initialized = await output.InitializeAsync();
+                if (initialized) Outputs.Add(output);
             });
         }
 
@@ -135,10 +136,11 @@ namespace OutputBrowser.Pages
             DispatcherQueue.TryEnqueue(async () => {
                 var viewModel = Outputs.FirstOrDefault(o => o.ImagePath == e.OldFullPath);
                 if (viewModel != null) Outputs.Remove(viewModel);
+                if (!File.Exists(e.FullPath)) return;
                 if (Outputs.Any(o => o.ImagePath == e.FullPath)) return;
                 var output = new OutputViewModel(Path, e.FullPath);
-                Outputs.Add(output);
-                await output.InitializeAsync();
+                var initialized = await output.InitializeAsync();
+                if (initialized) Outputs.Add(output);
             });
         }
 

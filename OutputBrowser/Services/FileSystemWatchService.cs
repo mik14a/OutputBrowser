@@ -29,6 +29,7 @@ namespace OutputBrowser.Services
 
         public FileSystemWatchService(WatchSettings watchSettings) {
             _watcher = new(watchSettings.Path) {
+                NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName,
                 EnableRaisingEvents = true,
                 IncludeSubdirectories = true,
                 InternalBufferSize = 32768,
