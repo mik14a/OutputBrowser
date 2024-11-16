@@ -2,14 +2,13 @@ using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.Options;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using OutputBrowser.Extensions;
-using OutputBrowser.Models;
 using OutputBrowser.Services;
 using OutputBrowser.ViewModels;
 using Windows.System;
@@ -32,9 +31,7 @@ namespace OutputBrowser.Pages
         bool _isScrolledAway;
 
         public OutputPage() {
-            var setting = File.Exists(App.SettingsFile)
-               ? JsonSerializer.Deserialize<OutputBrowserSettings>(File.ReadAllText(App.SettingsFile))?.Default
-               : new WatchSettings { Path = _path, Filters = _filters };
+            var setting = App.GetService<IOptions<Models.OutputBrowserSettings>>().Value.Default;
 
             _path = setting.Path;
             _filters = setting.Filters;
@@ -63,8 +60,10 @@ namespace OutputBrowser.Pages
                 _service.Changed -= OnChanged;
                 _service.Deleted -= OnDeleted;
                 _service.Renamed -= OnRenamed;
-                var settings = new OutputBrowserSettings { Default = new WatchSettings { Path = _path, Filters = _filters } };
-                File.WriteAllText(App.SettingsFile, JsonSerializer.Serialize(settings));
+                var setting = App.GetService<IOptions<Models.OutputBrowserSettings>>().Value.Default;
+                setting.Path = _path;
+                setting.Filters = _filters;
+                App.SaveSettings();
             }
         }
 

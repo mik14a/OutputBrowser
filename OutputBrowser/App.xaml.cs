@@ -1,5 +1,11 @@
 using System;
 using System.IO;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Microsoft.UI.Xaml;
 using WinUIEx;
 
@@ -10,7 +16,21 @@ namespace OutputBrowser;
 /// </summary>
 public partial class App : Application
 {
-    public static readonly string SettingsFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".OutputBrowser");
+    public static new App Current => (Application.Current as App)!;
+
+    public static T GetService<T>() where T : class {
+        var services = Current._host.Services;
+        return services.GetService<T>() is T service
+            ? service
+            : throw new ArgumentException($"{typeof(T)} needs to be registered in ConfigureServices within App.xaml.cs.");
+    }
+
+    public static void SaveSettings() {
+        var settings = GetService<IOptions<Models.OutputBrowserSettings>>().Value;
+        var settingsJson = JsonSerializer.Serialize(settings, SerializerOptions);
+        if (!Directory.Exists(PersonalDirectory)) Directory.CreateDirectory(PersonalDirectory);
+        File.WriteAllText(SettingsFile, settingsJson);
+    }
 
     /// <summary>
     /// Initializes the singleton application object.  This is the first line of authored code
@@ -21,6 +41,14 @@ public partial class App : Application
 #if !DEBUG
         UnhandledException += AppUnhandledException;
 #endif
+
+        var builder = Host.CreateApplicationBuilder();
+        builder.Configuration
+            .SetBasePath(AppContext.BaseDirectory)
+            .AddJsonFile(SettingsFile, optional: true);
+        builder.Services.Configure<Models.OutputBrowserSettings>(EnsureInitializeSettings);
+        builder.Services.Configure<Models.OutputBrowserSettings>(builder.Configuration);
+        _host = builder.Build();
     }
 
     /// <summary>
@@ -55,5 +83,21 @@ public partial class App : Application
     }
 #endif
 
+    static void EnsureInitializeSettings(Models.OutputBrowserSettings settings) {
+        settings.Default ??= new Models.WatchSettings {
+            Path = Environment.GetFolderPath(Environment.SpecialFolder.Personal),
+            Filters = "*.png;*.jpg;*.jpeg"
+        };
+    }
+
+    readonly IHost _host;
+
     MainWindow _window;
+
+    public static readonly string PersonalDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), nameof(OutputBrowser));
+    public static readonly string SettingsFile = Path.Combine(PersonalDirectory, "Settings.json");
+    public static readonly JsonSerializerOptions SerializerOptions = new() {
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        WriteIndented = true
+    };
 }
