@@ -39,6 +39,7 @@ public partial class App : Application
     public App() {
         InitializeComponent();
 #if !DEBUG
+        CleanupExceptionLog();
         UnhandledException += AppUnhandledException;
 #endif
 
@@ -68,15 +69,22 @@ public partial class App : Application
     }
 
 #if !DEBUG
+    void CleanupExceptionLog() {
+        var directory = new DirectoryInfo(PersonalDirectory);
+        if (!directory.Exists) return;
+        foreach (var file in directory.EnumerateFiles(string.Format(ExceptionFileFormat, "*"))) {
+            file.Delete();
+        }
+    }
     void AppUnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e) {
         e.Handled = true;
         try {
-            var exceptionText = $"Unhandled Exception: {e.Exception}\n\nStack Trace:\n{e.Exception.StackTrace}";
-            var fileName = $"OutputBrowser.UnhandledException.{DateTime.Now:yyyyMMdd_HHmmssfff}.txt";
-            var documentFolder = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-            var filePath = Path.Combine(documentFolder, fileName);
-            File.WriteAllText(filePath, exceptionText);
-            System.Diagnostics.Debug.WriteLine($"Exception saved to: {filePath}");
+            var text = $"Unhandled Exception: {e.Exception}\n\nStack Trace:\n{e.Exception.StackTrace}";
+            var name = string.Format(ExceptionFileFormat, DateTime.Now.ToString("yyyyMMdd_HHmmssfff"));
+            var path = Path.Combine(PersonalDirectory, name);
+            if (!Directory.Exists(PersonalDirectory)) Directory.CreateDirectory(PersonalDirectory);
+            File.WriteAllText(path, text);
+            System.Diagnostics.Debug.WriteLine($"Exception saved to: {path}");
         } catch (Exception ex) {
             System.Diagnostics.Debug.WriteLine($"Failed to save exception: {ex}");
         }
@@ -94,6 +102,7 @@ public partial class App : Application
 
     MainWindow _window;
 
+    public static readonly string ExceptionFileFormat = "OutputBrowser.UnhandledException.{0}.log";
     public static readonly string PersonalDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), nameof(OutputBrowser));
     public static readonly string SettingsFile = Path.Combine(PersonalDirectory, "Settings.json");
     public static readonly JsonSerializerOptions SerializerOptions = new() {
