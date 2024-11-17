@@ -3,12 +3,14 @@ using System.IO;
 using System.Linq;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using OutputBrowser.ViewModels;
 using WinUIEx;
 
 namespace OutputBrowser;
@@ -27,11 +29,11 @@ public partial class App : Application
             : throw new ArgumentException($"{typeof(T)} needs to be registered in ConfigureServices within App.xaml.cs.");
     }
 
-    public static void SaveSettings() {
+    public static async Task SaveSettingsAsync() {
         var settings = GetService<IOptions<Models.OutputBrowserSettings>>().Value;
         var settingsJson = JsonSerializer.Serialize(settings, SerializerOptions);
         if (!Directory.Exists(PersonalDirectory)) Directory.CreateDirectory(PersonalDirectory);
-        File.WriteAllText(SettingsFile, settingsJson);
+        await File.WriteAllTextAsync(SettingsFile, settingsJson);
     }
 
     /// <summary>
@@ -48,8 +50,10 @@ public partial class App : Application
         builder.Configuration
             .SetBasePath(AppContext.BaseDirectory)
             .AddJsonFile(SettingsFile, optional: true);
-        builder.Services.Configure<Models.OutputBrowserSettings>(EnsureInitializeSettings);
-        builder.Services.Configure<Models.OutputBrowserSettings>(builder.Configuration);
+        builder.Services
+            .Configure<Models.OutputBrowserSettings>(EnsureInitializeSettings)
+            .Configure<Models.OutputBrowserSettings>(builder.Configuration)
+            .AddSingleton<SettingViewModel>();
         _host = builder.Build();
     }
 

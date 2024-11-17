@@ -130,18 +130,7 @@
             <RowDefinition />
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <TextBox
-                x:Name="_Path"
-                Grid.Column="0"
-                Text="{x:Bind Path, Mode=TwoWay}" />
-            <TextBox
-                x:Name="_Filters"
-                Grid.Column="1"
-                Text="{x:Bind Filters, Mode=TwoWay}" />
+            <TextBox x:Name="_Path" Text="{x:Bind Path, Mode=TwoWay}" />
         </Grid>
         <ListView
             x:Name="_Outputs"

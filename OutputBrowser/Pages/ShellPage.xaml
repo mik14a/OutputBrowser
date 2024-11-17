@@ -7,6 +7,7 @@
     xmlns:local="using:OutputBrowser.Pages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:pages="using:OutputBrowser.Pages"
+    xmlns:ui="using:CommunityToolkit.WinUI"
     mc:Ignorable="d">
 
     <Grid>
@@ -45,7 +46,7 @@
             <NavigationView.MenuItems>
                 <NavigationViewItem
                     Content="出力ブラウザ"
-                    Icon="Accept"
+                    Icon="{ui:FontIcon Glyph=&#xE7C5;}"
                     Tag="OutputPage" />
             </NavigationView.MenuItems>
             <Frame x:Name="_ContentFrame" Margin="0,47,0,0" />

@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.Extensions.Options;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using OutputBrowser.Extensions;
@@ -21,28 +20,20 @@ namespace OutputBrowser.Pages;
 [INotifyPropertyChanged]
 public sealed partial class OutputPage : Page, IDisposable
 {
-    [ObservableProperty]
-    string _path = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-    [ObservableProperty]
-    string _filters = "*.png";
-
     public ObservableCollection<OutputViewModel> Outputs { get; } = [];
-    [ObservableProperty]
-    bool _isScrolledAway;
+
+    [ObservableProperty] string _path;
+    [ObservableProperty] bool _isScrolledAway;
 
     public OutputPage() {
-        _settings = App.GetService<IOptions<Models.OutputBrowserSettings>>().Value.Default;
+        _setting = App.GetService<SettingViewModel>();
 
-        _path = _settings.Path;
-        _filters = _settings.Filters;
-        _service = new FileSystemWatchService(_settings) {
-            Filters = _filters
-        };
+        _path = _setting.Path;
+        _service = new FileSystemWatchService(_setting.Path, _setting.Filters);
         _service.Changed += OnChanged;
         _service.Deleted += OnDeleted;
         _service.Renamed += OnRenamed;
         Loaded += PageLoaded;
-        Unloaded += PageUnloaded;
 
         InitializeComponent();
         DataContext = this;
@@ -54,11 +45,6 @@ public sealed partial class OutputPage : Page, IDisposable
         void PageLoaded(object sender, RoutedEventArgs e) {
             _Outputs.Focus(FocusState.Programmatic);
             IsScrolledAway = ScrolledAway(_Outputs.GetScrollViewer());
-        }
-        void PageUnloaded(object sender, RoutedEventArgs e) {
-            _settings.Path = _path;
-            _settings.Filters = _filters;
-            App.SaveSettings();
         }
         static bool ScrolledAway(ScrollViewer viewer) => viewer.ScrollableHeight != viewer.VerticalOffset;
     }
@@ -105,44 +91,41 @@ public sealed partial class OutputPage : Page, IDisposable
         _service.Path = value;
     }
 
-    partial void OnFiltersChanged(string value) {
-        if (string.IsNullOrWhiteSpace(value)) return;
-        _service.Filters = value;
-    }
-
     void OnChanged(object sender, FileSystemEventArgs e) {
         DispatcherQueue.TryEnqueue(async () => {
+            Remove(Outputs, e.FullPath);
             if (!File.Exists(e.FullPath)) return;
-            if (Outputs.Any(o => o.ImagePath == e.FullPath)) return;
-            var output = new OutputViewModel(Path, e.FullPath);
-            var initialized = await output.InitializeAsync();
-            if (initialized) Outputs.Add(output);
+            await AddAsync(Outputs, Path, e.FullPath);
         });
     }
 
     void OnDeleted(object sender, FileSystemEventArgs e) {
-        DispatcherQueue.TryEnqueue(() => {
-            var viewModel = Outputs.FirstOrDefault(o => o.ImagePath == e.FullPath);
-            if (viewModel != null) Outputs.Remove(viewModel);
-        });
+        DispatcherQueue.TryEnqueue(() => Remove(Outputs, e.FullPath));
     }
 
     void OnRenamed(object sender, RenamedEventArgs e) {
         DispatcherQueue.TryEnqueue(async () => {
-            var viewModel = Outputs.FirstOrDefault(o => o.ImagePath == e.OldFullPath);
-            if (viewModel != null) Outputs.Remove(viewModel);
+            Remove(Outputs, e.OldFullPath);
             if (!File.Exists(e.FullPath)) return;
-            if (Outputs.Any(o => o.ImagePath == e.FullPath)) return;
-            var output = new OutputViewModel(Path, e.FullPath);
-            var initialized = await output.InitializeAsync();
-            if (initialized) Outputs.Add(output);
+            await AddAsync(Outputs, Path, e.FullPath);
         });
     }
 
     readonly FileSystemWatchService _service;
-    readonly Models.WatchSettings _settings;
+    readonly SettingViewModel _setting;
 
     public void Dispose() {
         ((IDisposable)_service).Dispose();
+    }
+
+    static void Remove(ObservableCollection<OutputViewModel> outputs, string fullPath) {
+        var viewModel = outputs.FirstOrDefault(o => o.ImagePath == fullPath);
+        if (viewModel != null) outputs.Remove(viewModel);
+    }
+
+    static async Task AddAsync(ObservableCollection<OutputViewModel> outputs, string basePath, string fullPath) {
+        var output = new OutputViewModel(basePath, fullPath);
+        var initialized = await output.InitializeAsync();
+        if (initialized) outputs.Add(output);
     }
 }

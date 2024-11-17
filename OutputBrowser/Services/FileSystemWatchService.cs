@@ -27,13 +27,14 @@ namespace OutputBrowser.Services
             }
         }
 
-        public FileSystemWatchService(WatchSettings watchSettings) {
-            _watcher = new(watchSettings.Path) {
+        public FileSystemWatchService(string path, string filters) {
+            _watcher = new(path) {
                 NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName,
                 EnableRaisingEvents = true,
                 IncludeSubdirectories = true,
                 InternalBufferSize = 32768,
             };
+            Filters = filters;
             _watcher.Created += OnCreated;
             _watcher.Changed += OnChanged;
             _watcher.Deleted += OnDeleted;

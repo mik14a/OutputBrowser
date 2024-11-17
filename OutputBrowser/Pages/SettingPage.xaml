@@ -6,5 +6,66 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:OutputBrowser.Pages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:toolkit="using:CommunityToolkit.WinUI.Controls"
+    xmlns:ui="using:CommunityToolkit.WinUI"
+    Margin="8"
+    d:DataContext="{d:DesignInstance Type=local:SettingPage}"
     NavigationCacheMode="Disabled"
-    mc:Ignorable="d" />
+    mc:Ignorable="d">
+
+    <Grid RowSpacing="8">
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ScrollView>
+            <StackPanel>
+                <toolkit:SettingsExpander
+                    Description="デフォルトで表示される出力ブラウザの設定です"
+                    Header="出力ブラウザ"
+                    HeaderIcon="{ui:FontIcon Glyph=&#xE7C5;}"
+                    IsExpanded="True">
+                    <toolkit:SettingsExpander.Items>
+                        <toolkit:SettingsCard
+                            Description="監視するフォルダを指定してください"
+                            Header="フォルダ"
+                            HeaderIcon="{ui:FontIcon Glyph=&#xE8B7;}">
+                            <TextBox Text="{Binding Model.Path, Mode=TwoWay}" />
+                        </toolkit:SettingsCard>
+                        <toolkit:SettingsCard
+                            Description=";で区切って監視するファイル名を指定してください"
+                            Header="フィルタ"
+                            HeaderIcon="{ui:FontIcon Glyph=&#xE71C;}">
+                            <TextBox PlaceholderText="*.png;*.jpg;*.jpeg" Text="{Binding Model.Filters, Mode=TwoWay}" />
+                        </toolkit:SettingsCard>
+                    </toolkit:SettingsExpander.Items>
+                </toolkit:SettingsExpander>
+            </StackPanel>
+        </ScrollView>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" Command="{Binding OpenConfigFolderCommand}">
+                <StackPanel Orientation="Horizontal" Spacing="4">
+                    <SymbolIcon Symbol="Folder" />
+                    <TextBlock Text="保存フォルダを開く" />
+                </StackPanel>
+            </Button>
+            <Button
+                Grid.Column="2"
+                Command="{Binding SaveCommand}"
+                Style="{StaticResource AccentButtonStyle}">
+                <StackPanel Orientation="Horizontal" Spacing="4">
+                    <SymbolIcon Symbol="Save" />
+                    <TextBlock Text="保存" />
+                </StackPanel>
+            </Button>
+        </Grid>
+
+    </Grid>
+</Page>
