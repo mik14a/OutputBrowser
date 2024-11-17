@@ -10,6 +10,7 @@
     xmlns:viewmodels="using:OutputBrowser.ViewModels"
     x:Name="_Page"
     d:DataContext="{d:DesignInstance Type=local:OutputPage}"
+    NavigationCacheMode="Enabled"
     mc:Ignorable="d">
 
     <Page.Resources>

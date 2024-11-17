@@ -40,8 +40,15 @@
             Grid.RowSpan="2"
             IsBackButtonVisible="Collapsed"
             IsTabStop="False"
-            PaneDisplayMode="LeftMinimal">
-            <pages:OutputPage Margin="0,47,0,0" />
+            PaneDisplayMode="LeftMinimal"
+            SelectionChanged="NavigationViewSelectionChanged">
+            <NavigationView.MenuItems>
+                <NavigationViewItem
+                    Content="出力ブラウザ"
+                    Icon="Accept"
+                    Tag="OutputPage" />
+            </NavigationView.MenuItems>
+            <Frame x:Name="_ContentFrame" Margin="0,47,0,0" />
         </NavigationView>
 
     </Grid>

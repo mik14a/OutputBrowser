@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using Microsoft.Extensions.Configuration;
@@ -7,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using WinUIEx;
 
 namespace OutputBrowser;
@@ -42,7 +44,6 @@ public partial class App : Application
         CleanupExceptionLog();
         UnhandledException += AppUnhandledException;
 #endif
-
         var builder = Host.CreateApplicationBuilder();
         builder.Configuration
             .SetBasePath(AppContext.BaseDirectory)
@@ -63,6 +64,10 @@ public partial class App : Application
             ExtendsContentIntoTitleBar = true
         };
         var shell = (Pages.ShellPage)_window.Content;
+        var firstSelection = shell.NavigationView.MenuItems
+            .OfType<NavigationViewItem>()
+            .FirstOrDefault(i => i.Tag.Equals("OutputPage"));
+        shell.NavigationView.SelectedItem = firstSelection;
         _window.SetTitleBar(shell.AppTitleBar);
         _window.SetWindowSize(600, 800);
         _window.Activate();
