@@ -2,7 +2,7 @@ setlocal
 
 set APP_DIR=D:\Apps\OutputBrowser
 
-dotnet publish -c Release -f net8.0-windows10.0.19041.0 -r win-x64 --self-contained ^
+dotnet publish -c Release -f net9.0-windows10.0.19041.0 -r win-x64 --self-contained ^
  OutputBrowser\OutputBrowser.csproj ^
  -o %APP_DIR% ^
  /p:Platform=x64 ^

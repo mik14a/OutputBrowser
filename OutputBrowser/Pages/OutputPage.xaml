@@ -7,7 +7,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:OutputBrowser.Pages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:viewmodels="using:OutputBrowser.ViewModels"
+    xmlns:viewmodel="using:OutputBrowser.ViewModels"
     x:Name="_Page"
     d:DataContext="{d:DesignInstance Type=local:OutputPage}"
     NavigationCacheMode="Enabled"
@@ -17,7 +17,7 @@
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
         <converters:FileSizeToFriendlyStringConverter x:Key="FileSizeToFriendlyStringConverter" />
 
-        <DataTemplate x:Key="OutputDataTemplate" x:DataType="viewmodels:OutputViewModel">
+        <DataTemplate x:Key="OutputDataTemplate" x:DataType="viewmodel:OutputViewModel">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />

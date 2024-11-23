@@ -1,7 +1,6 @@
-namespace OutputBrowser.Models
+namespace OutputBrowser.Models;
+
+public class OutputBrowserSettings
 {
-    public class OutputBrowserSettings
-    {
-        public WatchSettings Default { get; set; }
-    }
+    public WatchSettings Default { get; set; }
 }
