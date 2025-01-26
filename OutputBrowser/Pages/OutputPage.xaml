@@ -69,43 +69,6 @@
                             </CommandBarFlyout.SecondaryCommands>
                         </CommandBarFlyout>
                     </Border.ContextFlyout>
-                    <!--<ToolTipService.ToolTip>
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition />
-                                <ColumnDefinition />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock
-                                Grid.Row="0"
-                                Grid.Column="0"
-                                Text="ファイル名" />
-                            <TextBlock
-                                Grid.Row="0"
-                                Grid.Column="1"
-                                Text="{x:Bind FileName}" />
-                            <TextBlock
-                                Grid.Row="1"
-                                Grid.Column="0"
-                                Text="ファイルサイズ" />
-                            <TextBlock
-                                Grid.Row="1"
-                                Grid.Column="1"
-                                Text="{x:Bind Size, Converter={StaticResource FileSizeToFriendlyStringConverter}}" />
-                            <TextBlock
-                                Grid.Row="2"
-                                Grid.Column="0"
-                                Text="最終更新日" />
-                            <TextBlock
-                                Grid.Row="2"
-                                Grid.Column="1"
-                                Text="{x:Bind DateModified}" />
-                        </Grid>
-                    </ToolTipService.ToolTip>-->
                     <Grid>
                         <Image Source="{x:Bind Image, Mode=OneWay}" />
                         <Border

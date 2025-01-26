@@ -7,13 +7,16 @@ public partial class SettingViewModel : ObservableRecipient
 {
     public Models.OutputBrowserSettings Settings => _settings;
 
-    [ObservableProperty] string _path;
-    [ObservableProperty] string _filters;
+    [ObservableProperty]
+    public partial string Path { get; set; }
+
+    [ObservableProperty]
+    public partial string Filters { get; set; }
 
     public SettingViewModel(IOptions<Models.OutputBrowserSettings> settings) {
         _settings = settings.Value;
-        _path = _settings.Default.Path;
-        _filters = _settings.Default.Filters;
+        Path = _settings.Default.Path;
+        Filters = _settings.Default.Filters;
     }
 
     partial void OnPathChanged(string value) {

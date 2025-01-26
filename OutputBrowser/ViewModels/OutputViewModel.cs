@@ -19,9 +19,14 @@ public partial class OutputViewModel : ObservableRecipient
     public DateTime DateModified { get; }
     public long Size { get; }
 
-    [ObservableProperty] bool _visibleContactInfo = false;
-    [ObservableProperty] ImageSource _image;
-    [ObservableProperty] string _contactInfo;
+    [ObservableProperty]
+    public partial bool VisibleContactInfo { get; set; } = false;
+
+    [ObservableProperty]
+    public partial ImageSource Image { get; set; }
+
+    [ObservableProperty]
+    public partial string ContactInfo { get; set; }
 
     public OutputViewModel(string basePath, string fullPath) {
         ImagePath = fullPath;

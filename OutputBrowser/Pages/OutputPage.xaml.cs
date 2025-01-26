@@ -22,18 +22,21 @@ public sealed partial class OutputPage : Page, IDisposable
 {
     public ObservableCollection<OutputViewModel> Outputs { get; } = [];
 
-    [ObservableProperty] string _path;
-    [ObservableProperty] bool _isScrolledAway;
+    [ObservableProperty]
+    public partial string Path { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsScrolledAway { get; set; }
 
     public OutputPage() {
         _setting = App.GetService<SettingViewModel>();
-
-        _path = _setting.Path;
         _service = new FileSystemWatchService(_setting.Path, _setting.Filters);
         _service.Changed += OnChanged;
         _service.Deleted += OnDeleted;
         _service.Renamed += OnRenamed;
         Loaded += PageLoaded;
+
+        Path = _setting.Path;
 
         InitializeComponent();
         DataContext = this;
