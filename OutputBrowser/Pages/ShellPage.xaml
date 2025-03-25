@@ -16,26 +16,28 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Border
+        <Grid
             x:Name="_AppTitleBar"
             Height="{Binding ElementName=_NavigationView, Path=CompactPaneLength}"
-            Margin="52,0,0,0"
+            HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch"
             AutomationProperties.AutomationId="AppTitleBar"
-            Canvas.ZIndex="1"
             IsHitTestVisible="True">
-            <StackPanel VerticalAlignment="Stretch" Orientation="Horizontal">
-                <Image
-                    Width="16"
-                    VerticalAlignment="Center"
-                    Source="ms-appx:///Assets/Tiles/TitlebarLogo.png" />
-                <TextBlock
-                    Margin="4,0"
-                    VerticalAlignment="Center"
-                    Style="{StaticResource CaptionTextBlockStyle}"
-                    Text="OutputBrowser" />
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <StackPanel
+                Grid.Column="1"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Orientation="Horizontal"
+                Spacing="4">
+                <Image Width="16" Source="ms-appx:///Assets/Tiles/TitlebarLogo.png" />
+                <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="OutputBrowser" />
             </StackPanel>
-        </Border>
+        </Grid>
         <NavigationView
             x:Name="_NavigationView"
             Grid.RowSpan="2"
