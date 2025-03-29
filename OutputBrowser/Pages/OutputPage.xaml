@@ -7,6 +7,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:OutputBrowser.Pages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:sys="using:System"
     xmlns:viewmodel="using:OutputBrowser.ViewModels"
     x:Name="_Page"
     d:DataContext="{d:DesignInstance Type=local:OutputPage}"
@@ -18,16 +19,61 @@
         <converters:FileSizeToFriendlyStringConverter x:Key="FileSizeToFriendlyStringConverter" />
 
         <DataTemplate x:Key="OutputDataTemplate" x:DataType="viewmodel:OutputViewModel">
-            <Grid>
+            <Grid ColumnSpacing="4" RowSpacing="4">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition />
                 </Grid.RowDefinitions>
-                <TextBlock
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Border
+                    Grid.RowSpan="2"
+                    Width="40"
+                    Height="40"
+                    Margin="0,4,4,0"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Top"
+                    Background="AliceBlue"
+                    Visibility="{x:Bind IsVisibleSender, Converter={StaticResource BoolToVisibilityConverter}}" />
+                <StackPanel
                     Grid.Row="0"
-                    Text="{x:Bind DisplayName}"
-                    TextTrimming="CharacterEllipsis" />
-                <Border Grid.Row="1" CornerRadius="8,8,8,8">
+                    Grid.Column="1"
+                    Visibility="{x:Bind IsVisibleSender, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="{x:Bind Sender}" />
+                        <TextBlock
+                            VerticalAlignment="Bottom"
+                            Style="{StaticResource CaptionTextBlockStyle}"
+                            Text="{x:Bind DateModified}" />
+                    </StackPanel>
+                    <HyperlinkButton
+                        Padding="0"
+                        Command="{Binding ElementName=_Page, Path=OpenWithDefaultAppCommand}"
+                        CommandParameter="{x:Bind}"
+                        Content="{x:Bind DisplayName}" />
+                </StackPanel>
+                <StackPanel
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    Orientation="Horizontal"
+                    Spacing="8"
+                    Visibility="{x:Bind IsVisibleSender, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=true}">
+                    <HyperlinkButton
+                        Padding="0"
+                        Command="{Binding ElementName=_Page, Path=OpenWithDefaultAppCommand}"
+                        CommandParameter="{x:Bind}"
+                        Content="{x:Bind DisplayName}" />
+                    <TextBlock
+                        VerticalAlignment="Bottom"
+                        Style="{StaticResource CaptionTextBlockStyle}"
+                        Text="{x:Bind DateModified}" />
+                </StackPanel>
+                <Border
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    CornerRadius="8,8,8,8">
                     <Border.ContextFlyout>
                         <CommandBarFlyout>
                             <AppBarButton
@@ -93,21 +139,26 @@
             <RowDefinition />
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
-            <TextBox x:Name="_Path" Text="{x:Bind Path, Mode=TwoWay}" />
+            <TextBox
+                x:Name="_Path"
+                Text="{x:Bind Path, Mode=TwoWay}"
+                Visibility="{x:Bind IsDefault, Converter={StaticResource BoolToVisibilityConverter}}" />
         </Grid>
-        <ListView
+        <GridView
             x:Name="_Outputs"
             Grid.Row="1"
-            Margin="0,8"
             ItemTemplate="{StaticResource OutputDataTemplate}"
             ItemsSource="{x:Bind Outputs}"
             SelectionMode="None">
-            <ListView.ItemsPanel>
+            <GridView.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <ItemsStackPanel VerticalAlignment="Bottom" ItemsUpdatingScrollMode="KeepLastItemInView" />
+                    <ItemsStackPanel
+                        Margin="8,0"
+                        VerticalAlignment="Bottom"
+                        ItemsUpdatingScrollMode="KeepLastItemInView" />
                 </ItemsPanelTemplate>
-            </ListView.ItemsPanel>
-        </ListView>
+            </GridView.ItemsPanel>
+        </GridView>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />

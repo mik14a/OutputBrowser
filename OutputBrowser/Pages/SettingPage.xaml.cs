@@ -28,8 +28,20 @@ public sealed partial class SettingPage : Page
     }
 
     [RelayCommand]
-    static async Task SaveAsync() {
-        await App.SaveSettingsAsync();
+    async Task SaveAsync() {
+        _model.Update();
+        await App.Current.SaveSettingsAsync();
+    }
+
+    [RelayCommand]
+    void NewWatches() {
+        var watches = Model.CreateWatchesSetting();
+        App.Current.Shell.Navigate(typeof(WatchSettingPage), (true, watches));
+    }
+
+    [RelayCommand]
+    void SelectWatches(WatchesSettingViewModel watchesSettingViewModel) {
+        App.Current.Shell.Navigate(typeof(WatchSettingPage), (false, watchesSettingViewModel));
     }
 
     readonly SettingViewModel _model;

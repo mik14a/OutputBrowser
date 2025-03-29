@@ -116,7 +116,7 @@ csharp_prefer_braces = when_multiline:suggestion
 csharp_prefer_simple_using_statement = true:suggestion
 csharp_style_namespace_declarations = block_scoped:suggestion
 csharp_style_prefer_method_group_conversion = true:suggestion
-csharp_style_prefer_primary_constructors = true:suggestion
+csharp_style_prefer_primary_constructors = true:none
 csharp_style_prefer_top_level_statements = true:suggestion
 
 # 式レベルの設定
@@ -138,11 +138,11 @@ csharp_style_unused_value_expression_statement_preference = false:silent
 csharp_using_directive_placement = outside_namespace:suggestion
 
 # 改行設定
-csharp_style_allow_blank_line_after_colon_in_constructor_initializer_experimental = true:suggestion
-csharp_style_allow_blank_line_after_token_in_arrow_expression_clause_experimental = true:silent
-csharp_style_allow_blank_line_after_token_in_conditional_expression_experimental = true:silent
-csharp_style_allow_blank_lines_between_consecutive_braces_experimental = false:suggestion
-csharp_style_allow_embedded_statements_on_same_line_experimental = true:suggestion
+csharp_style_allow_blank_line_after_colon_in_constructor_initializer_experimental = false
+csharp_style_allow_blank_line_after_token_in_arrow_expression_clause_experimental = false
+csharp_style_allow_blank_line_after_token_in_conditional_expression_experimental = false
+csharp_style_allow_blank_lines_between_consecutive_braces_experimental = false
+csharp_style_allow_embedded_statements_on_same_line_experimental = true
 
 #### C# 書式ルール ####
 
@@ -246,6 +246,11 @@ dotnet_naming_style.begins_with__.required_suffix =
 dotnet_naming_style.begins_with__.word_separator =
 dotnet_naming_style.begins_with__.capitalization = camel_case
 
+# CRR0029: ConfigureAwait(true) is called implicitly
+dotnet_diagnostic.CRR0029.severity = suggestion
+# CRR0033: The void async method should be in a try/catch block
+dotnet_diagnostic.CRR0033.severity = none
+
 [*.{cs,vb}]
 tab_width = 4
 indent_size = 4
@@ -289,7 +294,7 @@ indent_size = 2
 indent_style = space
 tab_width = 2
 
-[*.{csproj,appxmanifest}]
+[*.{csproj,wapproj,appxmanifest,resx,ja-JP.resx}]
 indent_size = 2
 indent_style = space
 tab_width = 2

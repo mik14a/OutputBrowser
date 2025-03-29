@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -20,7 +22,11 @@ namespace OutputBrowser.Pages;
 [INotifyPropertyChanged]
 public sealed partial class OutputPage : Page, IDisposable
 {
+    public static Type Type => typeof(OutputPage);
+
     public ObservableCollection<OutputViewModel> Outputs { get; } = [];
+
+    public bool IsDefault { get; } = false;
 
     [ObservableProperty]
     public partial string Path { get; set; }
@@ -28,28 +34,27 @@ public sealed partial class OutputPage : Page, IDisposable
     [ObservableProperty]
     public partial bool IsScrolledAway { get; set; }
 
-    public OutputPage() {
-        _setting = App.GetService<SettingViewModel>();
-        _service = new FileSystemWatchService(_setting.Path, _setting.Filters);
-        _service.Changed += OnChanged;
-        _service.Deleted += OnDeleted;
-        _service.Renamed += OnRenamed;
-        Loaded += PageLoaded;
-
-        Path = _setting.Path;
-
+    public OutputPage(WatchSettingsViewModel setting) {
+        IsDefault = true;
+        var service = new FileSystemWatchService("Default", setting.Path, setting.Filters);
+        service.Changed += OnChanged;
+        service.Deleted += OnDeleted;
+        service.Renamed += OnRenamed;
+        _services.Add(service);
+        Loaded += OnPageLoaded;
+        Path = setting.Path;
         InitializeComponent();
         DataContext = this;
+        _Outputs.Loaded += OnOutputsLoaded;
+    }
 
-        _Outputs.Loaded += (sender, args)
-            => ((ListView)sender).GetScrollViewer().ViewChanged += (sender, e)
-                => IsScrolledAway = ScrolledAway((ScrollViewer)sender);
-
-        void PageLoaded(object sender, RoutedEventArgs e) {
-            _Outputs.Focus(FocusState.Programmatic);
-            IsScrolledAway = ScrolledAway(_Outputs.GetScrollViewer());
-        }
-        static bool ScrolledAway(ScrollViewer viewer) => viewer.ScrollableHeight != viewer.VerticalOffset;
+    public OutputPage(WatchesSettingViewModel watches) {
+        watches.Watches.CollectionChanged += OnWatchesCollectionChanged;
+        watches.Watches.ForEach(AddWatch);
+        Loaded += OnPageLoaded;
+        InitializeComponent();
+        DataContext = this;
+        _Outputs.Loaded += OnOutputsLoaded;
     }
 
     [RelayCommand]
@@ -90,15 +95,18 @@ public sealed partial class OutputPage : Page, IDisposable
     partial void OnPathChanged(string value) {
         if (string.IsNullOrWhiteSpace(value)) return;
         if (!Directory.Exists(value)) return;
-        if (_service.Path == value) return;
-        _service.Path = value;
+        var service = _services.FirstOrDefault(s => s.Name == "Default");
+        if (service == null) return;
+        if (service.Path == value) return;
+        service.Path = value;
     }
 
     void OnChanged(object sender, FileSystemEventArgs e) {
+        if (sender is not FileSystemWatchService service) return;
         DispatcherQueue.TryEnqueue(async () => {
             Remove(Outputs, e.FullPath);
             if (!File.Exists(e.FullPath)) return;
-            await AddAsync(Outputs, Path, e.FullPath);
+            await AddAsync(Outputs, service.Name, service.Path, e.FullPath);
         });
     }
 
@@ -107,18 +115,57 @@ public sealed partial class OutputPage : Page, IDisposable
     }
 
     void OnRenamed(object sender, RenamedEventArgs e) {
+        if (sender is not FileSystemWatchService service) return;
         DispatcherQueue.TryEnqueue(async () => {
             Remove(Outputs, e.OldFullPath);
             if (!File.Exists(e.FullPath)) return;
-            await AddAsync(Outputs, Path, e.FullPath);
+            await AddAsync(Outputs, service.Name, service.Path, e.FullPath);
         });
     }
 
-    readonly FileSystemWatchService _service;
-    readonly SettingViewModel _setting;
+    void OnPageLoaded(object sender, RoutedEventArgs e) {
+        _Outputs.Focus(FocusState.Programmatic);
+        IsScrolledAway = ScrolledAway(_Outputs.GetScrollViewer());
+    }
+
+    void OnOutputsLoaded(object sender, RoutedEventArgs e) {
+        ((GridView)sender).GetScrollViewer().ViewChanged += OnOutputsViewChanged;
+    }
+
+    void OnOutputsViewChanged(object sender, ScrollViewerViewChangedEventArgs e) {
+        IsScrolledAway = ScrolledAway((ScrollViewer)sender);
+    }
+
+    void OnWatchesCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
+        if (e.Action == NotifyCollectionChangedAction.Add) {
+            e.NewItems.OfType<WatchSettingsViewModel>().ForEach(AddWatch);
+        } else if (e.Action == NotifyCollectionChangedAction.Remove) {
+            e.NewItems.OfType<WatchSettingsViewModel>().ForEach(RemoveWatch);
+        }
+    }
+
+    void AddWatch(WatchSettingsViewModel watch) {
+        var service = new FileSystemWatchService(watch.Name, watch.Path, watch.Filters);
+        service.Changed += OnChanged;
+        service.Deleted += OnDeleted;
+        service.Renamed += OnRenamed;
+        _services.Add(service);
+    }
+
+    void RemoveWatch(WatchSettingsViewModel watch) {
+        _services.Where(s => s.Name.Equals(watch.Name, StringComparison.InvariantCultureIgnoreCase))
+            .Do(s => _services.Remove(s))
+            .ForEach(s => ((IDisposable)s).Dispose());
+    }
+
+    readonly List<FileSystemWatchService> _services = [];
 
     public void Dispose() {
-        ((IDisposable)_service).Dispose();
+        _services.ForEach(service => ((IDisposable)service).Dispose());
+    }
+
+    static bool ScrolledAway(ScrollViewer viewer) {
+        return viewer.ScrollableHeight != viewer.VerticalOffset;
     }
 
     static void Remove(ObservableCollection<OutputViewModel> outputs, string fullPath) {
@@ -126,8 +173,8 @@ public sealed partial class OutputPage : Page, IDisposable
         if (viewModel != null) outputs.Remove(viewModel);
     }
 
-    static async Task AddAsync(ObservableCollection<OutputViewModel> outputs, string basePath, string fullPath) {
-        var output = new OutputViewModel(basePath, fullPath);
+    static async Task AddAsync(ObservableCollection<OutputViewModel> outputs, string sender, string basePath, string fullPath) {
+        var output = new OutputViewModel(sender, basePath, fullPath);
         var initialized = await output.InitializeAsync();
         if (initialized) outputs.Add(output);
     }

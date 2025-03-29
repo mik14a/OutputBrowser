@@ -8,6 +8,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:toolkit="using:CommunityToolkit.WinUI.Controls"
     xmlns:ui="using:CommunityToolkit.WinUI"
+    xmlns:viewmodel="using:OutputBrowser.ViewModels"
+    x:Name="_Page"
     Margin="8"
     d:DataContext="{d:DesignInstance Type=local:SettingPage}"
     NavigationCacheMode="Disabled"
@@ -31,16 +33,38 @@
                             Description="監視するフォルダを指定してください"
                             Header="フォルダ"
                             HeaderIcon="{ui:FontIcon Glyph=&#xE8B7;}">
-                            <TextBox Text="{Binding Model.Path, Mode=TwoWay}" />
+                            <TextBox Text="{Binding Model.Default.Path, Mode=TwoWay}" />
                         </toolkit:SettingsCard>
                         <toolkit:SettingsCard
                             Description=";で区切って監視するファイル名を指定してください"
                             Header="フィルタ"
                             HeaderIcon="{ui:FontIcon Glyph=&#xE71C;}">
-                            <TextBox PlaceholderText="*.png;*.jpg;*.jpeg" Text="{Binding Model.Filters, Mode=TwoWay}" />
+                            <TextBox PlaceholderText="*.png;*.jpg;*.jpeg" Text="{Binding Model.Default.Filters, Mode=TwoWay}" />
                         </toolkit:SettingsCard>
                     </toolkit:SettingsExpander.Items>
                 </toolkit:SettingsExpander>
+
+                <toolkit:SettingsExpander
+                    Description="監視対象のコレクション"
+                    Header="監視"
+                    HeaderIcon="{ui:FontIcon Glyph=&#xEA37;}"
+                    IsExpanded="True"
+                    ItemsSource="{x:Bind Model.Watches}">
+                    <Button
+                        Command="{x:Bind NewWatchesCommand}"
+                        Content="新規監視"
+                        Style="{StaticResource AccentButtonStyle}" />
+                    <toolkit:SettingsExpander.ItemTemplate>
+                        <DataTemplate x:DataType="viewmodel:WatchesSettingViewModel">
+                            <toolkit:SettingsCard
+                                Command="{Binding ElementName=_Page, Path=SelectWatchesCommand}"
+                                CommandParameter="{x:Bind}"
+                                Header="{x:Bind Name}"
+                                IsClickEnabled="True" />
+                        </DataTemplate>
+                    </toolkit:SettingsExpander.ItemTemplate>
+                </toolkit:SettingsExpander>
+
             </StackPanel>
         </ScrollView>
 

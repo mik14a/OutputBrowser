@@ -44,12 +44,12 @@
             IsBackButtonVisible="Collapsed"
             IsTabStop="False"
             PaneDisplayMode="LeftMinimal"
-            SelectionChanged="NavigationViewSelectionChanged">
+            SelectionChanged="OnNavigationViewSelectionChanged">
             <NavigationView.MenuItems>
                 <NavigationViewItem
                     Content="出力ブラウザ"
                     Icon="{ui:FontIcon Glyph=&#xE7C5;}"
-                    Tag="OutputPage" />
+                    Tag="{x:Bind pages:OutputPage.Type}" />
             </NavigationView.MenuItems>
             <Frame x:Name="_ContentFrame" Margin="0,47,0,0" />
         </NavigationView>

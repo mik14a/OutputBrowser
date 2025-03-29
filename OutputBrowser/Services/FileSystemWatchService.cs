@@ -11,6 +11,8 @@ public partial class FileSystemWatchService : IDisposable
     public event RenamedEventHandler Renamed;
     public event ErrorEventHandler Error;
 
+    public string Name { get; }
+
     public string Path {
         get => _watcher.Path;
         set => _watcher.Path = value;
@@ -26,7 +28,8 @@ public partial class FileSystemWatchService : IDisposable
         }
     }
 
-    public FileSystemWatchService(string path, string filters) {
+    public FileSystemWatchService(string name, string path, string filters) {
+        Name = name;
         _watcher = new(path) {
             NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName,
             EnableRaisingEvents = true,

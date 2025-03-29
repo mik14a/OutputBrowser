@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Linq;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -9,7 +8,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 using OutputBrowser.ViewModels;
 using WinUIEx;
 
@@ -22,6 +20,8 @@ public partial class App : Application
 {
     public static new App Current => (Application.Current as App)!;
 
+    public Pages.ShellPage Shell => (Pages.ShellPage)_window.Content;
+
     public static T GetService<T>() where T : class {
         var services = Current._host.Services;
         return services.GetService<T>() is T service
@@ -29,7 +29,7 @@ public partial class App : Application
             : throw new ArgumentException($"{typeof(T)} needs to be registered in ConfigureServices within App.xaml.cs.");
     }
 
-    public static async Task SaveSettingsAsync() {
+    public async Task SaveSettingsAsync() {
         var settings = GetService<IOptions<Models.OutputBrowserSettings>>().Value;
         var settingsJson = JsonSerializer.Serialize(settings, SerializerOptions);
         if (!Directory.Exists(PersonalDirectory)) Directory.CreateDirectory(PersonalDirectory);
@@ -68,10 +68,6 @@ public partial class App : Application
             ExtendsContentIntoTitleBar = true
         };
         var shell = (Pages.ShellPage)_window.Content;
-        var firstSelection = shell.NavigationView.MenuItems
-            .OfType<NavigationViewItem>()
-            .FirstOrDefault(i => i.Tag.Equals("OutputPage"));
-        shell.NavigationView.SelectedItem = firstSelection;
         _window.SetTitleBar(shell.AppTitleBar);
         _window.SetWindowSize(600, 800);
         _window.Activate();
