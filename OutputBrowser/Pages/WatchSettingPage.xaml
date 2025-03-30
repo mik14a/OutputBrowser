@@ -29,24 +29,56 @@
                 <viewmodel:WatchSettingsViewModel />
             </ContentDialog.DataContext>
             <ContentDialog.Content>
-                <StackPanel Spacing="8">
-                    <TextBox Header="名前" Text="{Binding Name, Mode=TwoWay}" />
-                    <TextBox Header="パス" Text="{Binding Path, Mode=TwoWay}" />
-                    <TextBox
-                        Header="フィルタ"
-                        PlaceholderText="*.png;*.jpg;*.jpeg"
-                        Text="{Binding Filters, Mode=TwoWay}" />
-                </StackPanel>
+                <Grid ColumnSpacing="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="アイコン" />
+                        <Button
+                            Grid.Column="0"
+                            Width="40"
+                            Height="40"
+                            Padding="0"
+                            BorderBrush="{StaticResource AccentFillColorDefaultBrush}"
+                            Command="{x:Bind SelectImageCommand}"
+                            CommandParameter="{Binding}"
+                            CornerRadius="20">
+                            <Image Source="{Binding IconSource, Mode=OneWay}" />
+                        </Button>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Spacing="8">
+                        <TextBox Header="名前" Text="{Binding Name, Mode=TwoWay}" />
+                        <TextBox Header="パス" Text="{Binding Path, Mode=TwoWay}" />
+                        <TextBox
+                            Header="フィルタ"
+                            PlaceholderText="*.png;*.jpg;*.jpeg"
+                            Text="{Binding Filters, Mode=TwoWay}" />
+                    </StackPanel>
+                </Grid>
             </ContentDialog.Content>
         </ContentDialog>
 
         <ScrollView>
             <StackPanel>
-                <toolkit:SettingsCard Header="監視名">
+                <toolkit:SettingsCard Header="アイコン">
+                    <ComboBox
+                        x:Name="_Icon"
+                        DisplayMemberPath="Name"
+                        ItemsSource="{x:Bind local:WatchSettingPage.Icons}"
+                        SelectedValue="{x:Bind Model.Icon, Mode=TwoWay}"
+                        SelectedValuePath="Icon" />
+                    <toolkit:SettingsCard.HeaderIcon>
+                        <SymbolIcon Symbol="{x:Bind Model.Icon, Mode=OneWay}" />
+                    </toolkit:SettingsCard.HeaderIcon>
+                </toolkit:SettingsCard>
+                <toolkit:SettingsCard Header="監視名" HeaderIcon="{ui:FontIcon Glyph=&#xED59;}">
                     <TextBox Text="{x:Bind Model.Name, Mode=TwoWay}" />
                 </toolkit:SettingsCard>
                 <toolkit:SettingsExpander
                     Header="監視対象"
+                    HeaderIcon="{ui:FontIcon Glyph=&#xE73E;}"
                     IsExpanded="True"
                     ItemsSource="{x:Bind Model.Watches}">
                     <Button
@@ -64,6 +96,9 @@
                                     <TextBlock Text="{x:Bind Path, Mode=OneWay}" />
                                     <TextBlock HorizontalAlignment="Right" Text="{x:Bind Filters, Mode=OneWay}" />
                                 </StackPanel>
+                                <toolkit:SettingsCard.HeaderIcon>
+                                    <ImageIcon Source="{x:Bind IconSource, Mode=OneWay}" />
+                                </toolkit:SettingsCard.HeaderIcon>
                             </toolkit:SettingsCard>
                         </DataTemplate>
                     </toolkit:SettingsExpander.ItemTemplate>

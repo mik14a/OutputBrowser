@@ -14,6 +14,7 @@ namespace OutputBrowser.ViewModels;
 public partial class OutputViewModel : ObservableRecipient
 {
     public string Sender { get; }
+    public ImageSource Icon { get; }
     public bool IsVisibleSender { get; }
     public string ImagePath { get; }
     public string FileName { get; }
@@ -30,8 +31,9 @@ public partial class OutputViewModel : ObservableRecipient
     [ObservableProperty]
     public partial string ContactInfo { get; set; }
 
-    public OutputViewModel(string sender, string basePath, string fullPath) {
+    public OutputViewModel(string sender, ImageSource icon, string basePath, string fullPath) {
         Sender = sender;
+        Icon = icon;
         IsVisibleSender = !sender.Equals("Default", StringComparison.InvariantCultureIgnoreCase);
         ImagePath = fullPath;
         FileName = Path.GetFileName(fullPath);

@@ -35,8 +35,12 @@
                     Margin="0,4,4,0"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Top"
-                    Background="AliceBlue"
-                    Visibility="{x:Bind IsVisibleSender, Converter={StaticResource BoolToVisibilityConverter}}" />
+                    BorderBrush="{StaticResource ControlFillColorDisabled}"
+                    BorderThickness="1"
+                    CornerRadius="20"
+                    Visibility="{x:Bind IsVisibleSender, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <Image Source="{x:Bind Icon}" />
+                </Border>
                 <StackPanel
                     Grid.Row="0"
                     Grid.Column="1"

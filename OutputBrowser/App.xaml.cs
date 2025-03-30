@@ -19,6 +19,7 @@ namespace OutputBrowser;
 public partial class App : Application
 {
     public static new App Current => (Application.Current as App)!;
+    public static Window MainWindow => Current!._window;
 
     public Pages.ShellPage Shell => (Pages.ShellPage)_window.Content;
 

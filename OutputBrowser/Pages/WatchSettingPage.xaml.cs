@@ -1,10 +1,15 @@
 using System;
 using System.ComponentModel;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using OutputBrowser.ViewModels;
+using Windows.Storage.FileProperties;
+using Windows.Storage.Pickers;
+using WinRT.Interop;
 
 namespace OutputBrowser.Pages
 {
@@ -13,6 +18,9 @@ namespace OutputBrowser.Pages
     /// </summary>
     public sealed partial class WatchSettingPage : Page
     {
+        public record struct SymbolIcon(string Name, Symbol Icon);
+        public static SymbolIcon[] Icons { get; } = [.. Enum.GetValues<Symbol>().Select(s => new SymbolIcon(Enum.GetName(s), s))];
+
         public bool IsNewWatchesSetting { get; set; }
 
         public WatchesSettingViewModel Model { get; private set; }
@@ -25,6 +33,7 @@ namespace OutputBrowser.Pages
         protected override void OnNavigatedTo(NavigationEventArgs e) {
             var parameter = e.Parameter;
             (IsNewWatchesSetting, Model) = (ValueTuple<bool, WatchesSettingViewModel>)parameter;
+            _Icon.SelectedItem = Icons.FirstOrDefault(i => i.Icon == Model.Icon);
             base.OnNavigatedTo(e);
         }
 
@@ -52,6 +61,7 @@ namespace OutputBrowser.Pages
         [RelayCommand]
         async Task OpenWatchSettingsAsync(WatchSettingsViewModel watchSettingsViewModel) {
             var newWatchSettingsViewModel = new WatchSettingsViewModel {
+                Icon = watchSettingsViewModel.Icon,
                 Name = watchSettingsViewModel.Name,
                 Path = watchSettingsViewModel.Path,
                 Filters = watchSettingsViewModel.Filters
@@ -71,10 +81,31 @@ namespace OutputBrowser.Pages
         [RelayCommand]
         void OpenWatchSettingsUpdate(ValueTuple<WatchSettingsViewModel, WatchSettingsViewModel> parameter) {
             var (watchSettingsViewModel, newWatchSettingsViewModel) = parameter;
+            watchSettingsViewModel.Icon = newWatchSettingsViewModel.Icon;
             watchSettingsViewModel.Name = newWatchSettingsViewModel.Name;
             watchSettingsViewModel.Path = newWatchSettingsViewModel.Path;
             watchSettingsViewModel.Filters = newWatchSettingsViewModel.Filters;
             _WatchSettingsDialog.Hide();
+        }
+
+        [RelayCommand]
+        async Task SelectImage(WatchSettingsViewModel watchSettingsViewModel) {
+            var picker = new FileOpenPicker {
+                ViewMode = PickerViewMode.Thumbnail,
+                SuggestedStartLocation = PickerLocationId.PicturesLibrary
+            };
+            picker.FileTypeFilter.Add(".png");
+            picker.FileTypeFilter.Add(".jpg");
+            picker.FileTypeFilter.Add(".jpeg");
+            InitializeWithWindow.Initialize(picker, WindowNative.GetWindowHandle(App.MainWindow));
+            var file = await picker.PickSingleFileAsync();
+            if (file != null) {
+                var thumbnail = await file.GetThumbnailAsync(ThumbnailMode.MusicView, 120, ThumbnailOptions.ResizeThumbnail);
+                using var stream = thumbnail.AsStreamForRead();
+                var buffer = new byte[stream.Length];
+                stream.ReadExactly(buffer, 0, buffer.Length);
+                watchSettingsViewModel.Icon = buffer;
+            }
         }
 
         [RelayCommand]

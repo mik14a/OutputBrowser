@@ -66,16 +66,15 @@ public sealed partial class ShellPage : Page
 
     void OnWatchesCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
         if (e.Action == NotifyCollectionChangedAction.Add) {
-            e.NewItems.OfType<WatchesSettingViewModel>()
-                .ForEach(AddNavigationViewItem);
+            e.NewItems.OfType<WatchesSettingViewModel>().ForEach(AddNavigationViewItem);
         } else if (e.Action == NotifyCollectionChangedAction.Remove) {
-            e.OldItems.OfType<WatchesSettingViewModel>()
-                .ForEach(RemoveNavigationViewItem);
+            e.OldItems.OfType<WatchesSettingViewModel>().ForEach(RemoveNavigationViewItem);
         }
     }
 
     void AddNavigationViewItem(WatchesSettingViewModel watch) {
         _NavigationView.MenuItems.Add(new NavigationViewItem {
+            Icon = new SymbolIcon(watch.Icon),
             Content = watch.Name,
             Tag = watch
         });

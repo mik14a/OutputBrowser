@@ -1,10 +1,19 @@
+using System;
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Runtime.InteropServices.WindowsRuntime;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Imaging;
 
 namespace OutputBrowser.ViewModels;
 
 public partial class WatchesSettingViewModel : ObservableRecipient
 {
+    [ObservableProperty]
+    public partial Symbol Icon { get; set; }
+
     [ObservableProperty]
     public partial string Name { get; set; }
 
@@ -13,12 +22,15 @@ public partial class WatchesSettingViewModel : ObservableRecipient
     public WatchesSettingViewModel(SettingViewModel setting, Models.WatchesSettings watch) {
         _setting = setting;
         _watch = watch;
+        Icon = Enum.TryParse<Symbol>(watch.Icon, out var icon) ? icon : Symbol.Link;
         Name = _watch.Name;
         _watch.Watches.ForEach(w => Watches.Add(new WatchSettingsViewModel {
+            Icon = w.Icon,
             Name = w.Name,
             Path = w.Path,
             Filters = w.Filters
         }));
+
     }
 
     public void AddWatchSettings(WatchSettingsViewModel watchSettingsViewModel) {
@@ -35,10 +47,12 @@ public partial class WatchesSettingViewModel : ObservableRecipient
     }
 
     public void Update() {
+        _watch.Icon = Icon.ToString();
         _watch.Name = Name;
         _watch.Watches.Clear();
         foreach (var watch in Watches) {
             _watch.Watches.Add(new Models.WatchSettings {
+                Icon = watch.Icon,
                 Name = watch.Name,
                 Path = watch.Path,
                 Filters = watch.Filters

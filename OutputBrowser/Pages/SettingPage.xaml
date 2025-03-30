@@ -59,8 +59,12 @@
                             <toolkit:SettingsCard
                                 Command="{Binding ElementName=_Page, Path=SelectWatchesCommand}"
                                 CommandParameter="{x:Bind}"
-                                Header="{x:Bind Name}"
-                                IsClickEnabled="True" />
+                                Header="{x:Bind Name, Mode=OneWay}"
+                                IsClickEnabled="True">
+                                <toolkit:SettingsCard.HeaderIcon>
+                                    <SymbolIcon Symbol="{x:Bind Icon, Mode=OneWay}" />
+                                </toolkit:SettingsCard.HeaderIcon>
+                            </toolkit:SettingsCard>
                         </DataTemplate>
                     </toolkit:SettingsExpander.ItemTemplate>
                 </toolkit:SettingsExpander>

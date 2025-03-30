@@ -9,6 +9,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
 using OutputBrowser.Extensions;
 using OutputBrowser.Services;
 using OutputBrowser.ViewModels;
@@ -106,7 +107,7 @@ public sealed partial class OutputPage : Page, IDisposable
         DispatcherQueue.TryEnqueue(async () => {
             Remove(Outputs, e.FullPath);
             if (!File.Exists(e.FullPath)) return;
-            await AddAsync(Outputs, service.Name, service.Path, e.FullPath);
+            await AddAsync(Outputs, service.Name, _icons.TryGetValue(service.Name, out var icon) ? icon : null, service.Path, e.FullPath);
         });
     }
 
@@ -119,7 +120,7 @@ public sealed partial class OutputPage : Page, IDisposable
         DispatcherQueue.TryEnqueue(async () => {
             Remove(Outputs, e.OldFullPath);
             if (!File.Exists(e.FullPath)) return;
-            await AddAsync(Outputs, service.Name, service.Path, e.FullPath);
+            await AddAsync(Outputs, service.Name, _icons.TryGetValue(service.Name, out var icon) ? icon : null, service.Path, e.FullPath);
         });
     }
 
@@ -150,6 +151,7 @@ public sealed partial class OutputPage : Page, IDisposable
         service.Deleted += OnDeleted;
         service.Renamed += OnRenamed;
         _services.Add(service);
+        _icons.Add(watch.Name, watch.IconSource);
     }
 
     void RemoveWatch(WatchSettingsViewModel watch) {
@@ -159,6 +161,7 @@ public sealed partial class OutputPage : Page, IDisposable
     }
 
     readonly List<FileSystemWatchService> _services = [];
+    readonly Dictionary<string, ImageSource> _icons = [];
 
     public void Dispose() {
         _services.ForEach(service => ((IDisposable)service).Dispose());
@@ -173,8 +176,8 @@ public sealed partial class OutputPage : Page, IDisposable
         if (viewModel != null) outputs.Remove(viewModel);
     }
 
-    static async Task AddAsync(ObservableCollection<OutputViewModel> outputs, string sender, string basePath, string fullPath) {
-        var output = new OutputViewModel(sender, basePath, fullPath);
+    static async Task AddAsync(ObservableCollection<OutputViewModel> outputs, string sender, ImageSource icon, string basePath, string fullPath) {
+        var output = new OutputViewModel(sender, icon, basePath, fullPath);
         var initialized = await output.InitializeAsync();
         if (initialized) outputs.Add(output);
     }

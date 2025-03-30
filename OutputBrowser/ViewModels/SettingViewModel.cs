@@ -32,6 +32,7 @@ public partial class SettingViewModel : ObservableRecipient
             _settings.Watches.Add(watch.Name, new Models.WatchesSettings {
                 Name = watch.Name,
                 Watches = [.. watch.Watches.Select(w => new Models.WatchSettings {
+                    Icon = w.Icon,
                     Name = w.Name,
                     Path = w.Path,
                     Filters = w.Filters
