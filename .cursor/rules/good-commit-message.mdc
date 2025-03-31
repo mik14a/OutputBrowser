@@ -1,0 +1,6 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+Write an English commit message title that concisely represents the purpose of the changes, considering their objectives and reviewing any modifications. When composing a commit message, prioritize describing the purpose of the changes. Since the committed files are already clear, there's no need to mention them. Focus on the essence of your changes.
