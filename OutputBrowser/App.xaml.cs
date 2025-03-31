@@ -8,6 +8,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls.Primitives;
+using Microsoft.UI.Xaml.Media;
 using OutputBrowser.ViewModels;
 using WinUIEx;
 
@@ -58,6 +60,21 @@ public partial class App : Application
         _host = builder.Build();
     }
 
+     public void SetElementTheme(ElementTheme value) {
+        if (MainWindow.Content is FrameworkElement root) {
+            root.RequestedTheme = value;
+        }
+    }
+
+     public void SetSystemBackdrop(Controls.SystemBackdrop value) {
+        MainWindow.SystemBackdrop = value switch {
+            Controls.SystemBackdrop.Mica => new MicaBackdrop { Kind = Microsoft.UI.Composition.SystemBackdrops.MicaKind.Base },
+            Controls.SystemBackdrop.MicaAlt => new MicaBackdrop { Kind = Microsoft.UI.Composition.SystemBackdrops.MicaKind.BaseAlt },
+            Controls.SystemBackdrop.Acrylic => new DesktopAcrylicBackdrop(),
+            _ => new MicaBackdrop { Kind = Microsoft.UI.Composition.SystemBackdrops.MicaKind.Base }
+        };
+    }
+
     /// <summary>
     /// Invoked when the application is launched.
     /// </summary>
@@ -68,6 +85,10 @@ public partial class App : Application
             Content = new Pages.ShellPage(),
             ExtendsContentIntoTitleBar = true
         };
+        var settings = GetService<IOptions<Models.OutputBrowserSettings>>().Value;
+        SetElementTheme(Enum.TryParse<ElementTheme>(settings.Theme, out var theme) ? theme : ElementTheme.Default);
+        SetSystemBackdrop(Enum.TryParse<Controls.SystemBackdrop>(settings.Backdrop, out var backdrop) ? backdrop : Controls.SystemBackdrop.Mica);
+
         var shell = (Pages.ShellPage)_window.Content;
         _window.SetTitleBar(shell.AppTitleBar);
         _window.SetWindowSize(600, 800);

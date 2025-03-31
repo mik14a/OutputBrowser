@@ -18,10 +18,12 @@
 
         <Grid
             x:Name="_AppTitleBar"
+            Canvas.Left="48"
             Height="{Binding ElementName=_NavigationView, Path=CompactPaneLength}"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch"
             AutomationProperties.AutomationId="AppTitleBar"
+            Canvas.ZIndex="1"
             IsHitTestVisible="True">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />

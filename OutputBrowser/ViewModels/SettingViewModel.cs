@@ -1,14 +1,18 @@
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.Options;
+using Microsoft.UI.Xaml;
 
 namespace OutputBrowser.ViewModels;
 
 public partial class SettingViewModel : ObservableRecipient
 {
-    public WatchSettingsViewModel Default { get; set; } = new();
+    [ObservableProperty] public partial ElementTheme Theme { get; set; }
+    [ObservableProperty] public partial Controls.SystemBackdrop Backdrop { get; set; }
 
+    public WatchSettingsViewModel Default { get; set; } = new();
     public ObservableCollection<WatchesSettingViewModel> Watches { get; } = [];
 
     public SettingViewModel(IOptions<Models.OutputBrowserSettings> settings) {
@@ -17,6 +21,8 @@ public partial class SettingViewModel : ObservableRecipient
     }
 
     public void Apply() {
+        Theme = Enum.TryParse<ElementTheme>(_settings.Theme, out var theme) ? theme : ElementTheme.Default;
+        Backdrop = Enum.TryParse<Controls.SystemBackdrop>(_settings.Backdrop, out var backdrop) ? backdrop : Controls.SystemBackdrop.Mica;
         Default.Path = _settings.Default.Path;
         Default.Filters = _settings.Default.Filters;
         foreach (var watch in _settings.Watches) {
@@ -25,6 +31,8 @@ public partial class SettingViewModel : ObservableRecipient
     }
 
     public void Update() {
+        _settings.Theme = Theme.ToString();
+        _settings.Backdrop = Backdrop.ToString();
         _settings.Default.Path = Default.Path;
         _settings.Default.Filters = Default.Filters;
         _settings.Watches.Clear();
