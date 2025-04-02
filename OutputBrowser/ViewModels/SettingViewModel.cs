@@ -38,6 +38,7 @@ public partial class SettingViewModel : ObservableRecipient
         _settings.Watches.Clear();
         foreach (var watch in Watches) {
             _settings.Watches.Add(watch.Name, new Models.WatchesSettings {
+                Icon = watch.Icon.ToString(),
                 Name = watch.Name,
                 Watches = [.. watch.Watches.Select(w => new Models.WatchSettings {
                     Icon = w.Icon,

@@ -81,41 +81,41 @@
                     <Border.ContextFlyout>
                         <CommandBarFlyout>
                             <AppBarButton
+                                x:Uid="OpenFileButton"
                                 Command="{Binding ElementName=_Page, Path=OpenWithDefaultAppCommand}"
                                 CommandParameter="{x:Bind}"
-                                Icon="OpenFile"
-                                Label="開く" />
+                                Icon="OpenFile" />
                             <AppBarButton
+                                x:Uid="OpenFolderButton"
                                 Command="{Binding ElementName=_Page, Path=OpenFolderCommand}"
                                 CommandParameter="{x:Bind}"
-                                Icon="Folder"
-                                Label="画像フォルダを開く" />
+                                Icon="Folder" />
                             <AppBarButton
+                                x:Uid="CopyFileButton"
                                 Command="{Binding ElementName=_Page, Path=CopyCommand}"
                                 CommandParameter="{x:Bind}"
-                                Icon="Copy"
-                                Label="ファイルをコピー" />
+                                Icon="Copy" />
                             <AppBarButton
+                                x:Uid="CopyImageButton"
                                 Command="{Binding ElementName=_Page, Path=CopyImageCommand}"
                                 CommandParameter="{x:Bind}"
-                                Icon="Pictures"
-                                Label="画像をコピー" />
+                                Icon="Pictures" />
                             <CommandBarFlyout.SecondaryCommands>
                                 <AppBarButton
+                                    x:Uid="CopyPathButton"
                                     Command="{Binding ElementName=_Page, Path=CopyPathCommand}"
                                     CommandParameter="{x:Bind}"
-                                    Icon="Bookmarks"
-                                    Label="パスのコピー" />
+                                    Icon="Bookmarks" />
                                 <AppBarButton
+                                    x:Uid="CopyPromptButton"
                                     Command="{Binding ElementName=_Page, Path=CopyPromptCommand}"
                                     CommandParameter="{x:Bind}"
-                                    Icon="Page2"
-                                    Label="プロンプトのコピー" />
+                                    Icon="Page2" />
                                 <AppBarToggleButton
+                                    x:Uid="ShowPromptButton"
                                     x:Name="_ContactInfo"
                                     Icon="ContactInfo"
-                                    IsChecked="{x:Bind VisibleContactInfo, Mode=TwoWay}"
-                                    Label="プロンプトの表示" />
+                                    IsChecked="{x:Bind VisibleContactInfo, Mode=TwoWay}" />
                             </CommandBarFlyout.SecondaryCommands>
                         </CommandBarFlyout>
                     </Border.ContextFlyout>

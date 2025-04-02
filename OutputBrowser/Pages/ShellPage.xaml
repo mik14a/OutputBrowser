@@ -37,7 +37,7 @@
                 Orientation="Horizontal"
                 Spacing="4">
                 <Image Width="16" Source="ms-appx:///Assets/Tiles/TitlebarLogo.png" />
-                <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="OutputBrowser" />
+                <TextBlock x:Uid="AppTitleTextBlock" Style="{StaticResource CaptionTextBlockStyle}" />
             </StackPanel>
         </Grid>
         <NavigationView
@@ -49,7 +49,7 @@
             SelectionChanged="OnNavigationViewSelectionChanged">
             <NavigationView.MenuItems>
                 <NavigationViewItem
-                    Content="出力ブラウザ"
+                    x:Uid="OutputBrowserNavigationViewItem"
                     Icon="{ui:FontIcon Glyph=&#xE7C5;}"
                     Tag="{x:Bind pages:OutputPage.Type}" />
             </NavigationView.MenuItems>

@@ -27,15 +27,11 @@
             <StackPanel>
 
                 <toolkit:SettingsExpander
-                    Description="アプリケーションのテーマ設定です"
-                    Header="テーマ"
+                    x:Uid="ApplicationSettingsSettingsExpander"
                     HeaderIcon="{ui:FontIcon Glyph=&#xE790;}"
                     IsExpanded="True">
                     <toolkit:SettingsExpander.Items>
-                        <toolkit:SettingsCard
-                            Description="アプリケーションのテーマを選択してください"
-                            Header="テーマ"
-                            HeaderIcon="{ui:FontIcon Glyph=&#xE790;}">
+                        <toolkit:SettingsCard x:Uid="ThemeSettingsSettingsCard" HeaderIcon="{ui:FontIcon Glyph=&#xE790;}">
                             <ComboBox
                                 x:Name="_Themes"
                                 DisplayMemberPath="Value"
@@ -43,10 +39,7 @@
                                 SelectedValue="{x:Bind Model.Theme, Mode=TwoWay}"
                                 SelectedValuePath="Key" />
                         </toolkit:SettingsCard>
-                        <toolkit:SettingsCard
-                            Description="背景エフェクトを選択してください"
-                            Header="背景エフェクト"
-                            HeaderIcon="{ui:FontIcon Glyph=&#xE7F4;}">
+                        <toolkit:SettingsCard x:Uid="BackdropSettingsSettingsCard" HeaderIcon="{ui:FontIcon Glyph=&#xE7F4;}">
                             <ComboBox
                                 x:Name="_Backdrops"
                                 DisplayMemberPath="Value"
@@ -58,36 +51,30 @@
                 </toolkit:SettingsExpander>
 
                 <toolkit:SettingsExpander
-                    Description="デフォルトで表示される出力ブラウザの設定です"
-                    Header="出力ブラウザ"
+                    x:Uid="DefaultBrowserSettingsExpander"
                     HeaderIcon="{ui:FontIcon Glyph=&#xE7C5;}"
                     IsExpanded="True">
                     <toolkit:SettingsExpander.Items>
-                        <toolkit:SettingsCard
-                            Description="監視するフォルダを指定してください"
-                            Header="フォルダ"
-                            HeaderIcon="{ui:FontIcon Glyph=&#xE8B7;}">
+                        <toolkit:SettingsCard x:Uid="DefaultFolderSettingsCard" HeaderIcon="{ui:FontIcon Glyph=&#xE8B7;}">
                             <TextBox Text="{Binding Model.Default.Path, Mode=TwoWay}" />
                         </toolkit:SettingsCard>
-                        <toolkit:SettingsCard
-                            Description=";で区切って監視するファイル名を指定してください"
-                            Header="フィルタ"
-                            HeaderIcon="{ui:FontIcon Glyph=&#xE71C;}">
-                            <TextBox PlaceholderText="*.png;*.jpg;*.jpeg" Text="{Binding Model.Default.Filters, Mode=TwoWay}" />
+                        <toolkit:SettingsCard x:Uid="DefaultFiltersSettingsCard" HeaderIcon="{ui:FontIcon Glyph=&#xE71C;}">
+                            <TextBox Text="{Binding Model.Default.Filters, Mode=TwoWay}" />
                         </toolkit:SettingsCard>
                     </toolkit:SettingsExpander.Items>
                 </toolkit:SettingsExpander>
 
                 <toolkit:SettingsExpander
-                    Description="監視対象のコレクション"
-                    Header="監視"
+                    x:Uid="WatchesSettingsExpander"
                     HeaderIcon="{ui:FontIcon Glyph=&#xEA37;}"
                     IsExpanded="True"
                     ItemsSource="{x:Bind Model.Watches}">
-                    <Button
-                        Command="{x:Bind NewWatchesCommand}"
-                        Content="新規監視"
-                        Style="{StaticResource AccentButtonStyle}" />
+                    <Button Command="{x:Bind NewWatchesCommand}">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <SymbolIcon Symbol="Add" />
+                            <TextBlock x:Uid="NewWatchButtonContent" />
+                        </StackPanel>
+                    </Button>
                     <toolkit:SettingsExpander.ItemTemplate>
                         <DataTemplate x:DataType="viewmodel:WatchesSettingViewModel">
                             <toolkit:SettingsCard
@@ -113,10 +100,12 @@
                 <ColumnDefinition />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" Command="{Binding OpenConfigFolderCommand}">
+            <Button
+                Grid.Column="0"
+                Command="{Binding OpenConfigFolderCommand}">
                 <StackPanel Orientation="Horizontal" Spacing="4">
                     <SymbolIcon Symbol="Folder" />
-                    <TextBlock Text="保存フォルダを開く" />
+                    <TextBlock x:Uid="OpenConfigFolderButtonContent" />
                 </StackPanel>
             </Button>
             <Button
@@ -125,7 +114,7 @@
                 Style="{StaticResource AccentButtonStyle}">
                 <StackPanel Orientation="Horizontal" Spacing="4">
                     <SymbolIcon Symbol="Save" />
-                    <TextBlock Text="保存" />
+                    <TextBlock x:Uid="SaveButtonContent" />
                 </StackPanel>
             </Button>
         </Grid>
