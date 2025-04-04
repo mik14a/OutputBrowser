@@ -1,0 +1,24 @@
+---
+description: Resource Generation
+globs: 
+alwaysApply: false
+---
+# Resource Generation Rules
+
+## Naming Convention
+- Use PascalCase for resource keys
+- Follow the pattern: `{TargetName}{ElementType}.{Property}`
+  - Example: `FiltersTextBox.Header`
+  - Example: `FiltersTextBox.PlaceholderText`
+
+## Structure
+- Use consistent naming across all pages
+
+## Content Guidelines
+- Keep text concise and clear
+- Use consistent terminology
+
+## File Organization
+- Maintain separate files for each language
+- Keep resource files in sync across languages
+- Use proper XML formatting and spacing
