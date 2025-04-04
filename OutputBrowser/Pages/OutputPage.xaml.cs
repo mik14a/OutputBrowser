@@ -35,6 +35,12 @@ public sealed partial class OutputPage : Page, IDisposable
     [ObservableProperty]
     public partial bool IsScrolledAway { get; set; }
 
+    [ObservableProperty]
+    public partial Symbol Icon { get; set; }
+
+    [ObservableProperty]
+    public partial string Title { get; set; }
+
     public OutputPage(WatchSettingsViewModel setting) {
         IsDefault = true;
         var service = new FileSystemWatchService("Default", setting.Path, setting.Filters);
@@ -50,6 +56,15 @@ public sealed partial class OutputPage : Page, IDisposable
     }
 
     public OutputPage(WatchesSettingViewModel watches) {
+        Icon = watches.Icon;
+        Title = watches.Name;
+        watches.PropertyChanging += (s, e) => {
+            if (e.PropertyName == nameof(watches.Icon)) {
+                Icon = watches.Icon;
+            } else if (e.PropertyName == nameof(watches.Name)) {
+                Title = watches.Name;
+            }
+        };
         watches.Watches.CollectionChanged += OnWatchesCollectionChanged;
         watches.Watches.ForEach(AddWatch);
         Loaded += OnPageLoaded;

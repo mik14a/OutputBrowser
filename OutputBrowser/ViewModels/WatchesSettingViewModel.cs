@@ -11,6 +11,8 @@ namespace OutputBrowser.ViewModels;
 
 public partial class WatchesSettingViewModel : ObservableRecipient
 {
+    public Page Page { get; set; }
+
     [ObservableProperty]
     public partial Symbol Icon { get; set; }
 

@@ -8,6 +8,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:pages="using:OutputBrowser.Pages"
     xmlns:ui="using:CommunityToolkit.WinUI"
+    xmlns:viewmodels="using:OutputBrowser.ViewModels"
     mc:Ignorable="d">
 
     <Grid>
@@ -45,14 +46,18 @@
             Grid.RowSpan="2"
             IsBackButtonVisible="Collapsed"
             IsTabStop="False"
+            MenuItemsSource="{x:Bind Watches}"
             PaneDisplayMode="LeftMinimal"
             SelectionChanged="OnNavigationViewSelectionChanged">
-            <NavigationView.MenuItems>
-                <NavigationViewItem
-                    x:Uid="OutputBrowserNavigationViewItem"
-                    Icon="{ui:FontIcon Glyph=&#xE7C5;}"
-                    Tag="{x:Bind pages:OutputPage.Type}" />
-            </NavigationView.MenuItems>
+            <NavigationView.MenuItemTemplate>
+                <DataTemplate x:DataType="viewmodels:WatchesSettingViewModel">
+                    <NavigationViewItem Content="{x:Bind Name, Mode=OneWay}" Tag="{x:Bind}">
+                        <NavigationViewItem.Icon>
+                            <SymbolIcon Symbol="{x:Bind Icon, Mode=OneWay}" />
+                        </NavigationViewItem.Icon>
+                    </NavigationViewItem>
+                </DataTemplate>
+            </NavigationView.MenuItemTemplate>
             <Frame x:Name="_ContentFrame" Margin="0,47,0,0" />
         </NavigationView>
 

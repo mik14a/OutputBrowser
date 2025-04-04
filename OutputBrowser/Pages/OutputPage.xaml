@@ -112,8 +112,8 @@
                                     CommandParameter="{x:Bind}"
                                     Icon="Page2" />
                                 <AppBarToggleButton
-                                    x:Uid="ShowPromptButton"
                                     x:Name="_ContactInfo"
+                                    x:Uid="ShowPromptButton"
                                     Icon="ContactInfo"
                                     IsChecked="{x:Bind VisibleContactInfo, Mode=TwoWay}" />
                             </CommandBarFlyout.SecondaryCommands>
@@ -138,19 +138,8 @@
     </Page.Resources>
 
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition />
-        </Grid.RowDefinitions>
-        <Grid Grid.Row="0">
-            <TextBox
-                x:Name="_Path"
-                Text="{x:Bind Path, Mode=TwoWay}"
-                Visibility="{x:Bind IsDefault, Converter={StaticResource BoolToVisibilityConverter}}" />
-        </Grid>
         <GridView
             x:Name="_Outputs"
-            Grid.Row="1"
             ItemTemplate="{StaticResource OutputDataTemplate}"
             ItemsSource="{x:Bind Outputs}"
             SelectionMode="None">
@@ -163,7 +152,27 @@
                 </ItemsPanelTemplate>
             </GridView.ItemsPanel>
         </GridView>
-        <Grid Grid.Row="1">
+
+        <CommandBar Background="{StaticResource ControlOnImageFillColorDefault}">
+            <CommandBar.Content>
+                <StackPanel
+                    Margin="8,14"
+                    Orientation="Horizontal"
+                    Spacing="8">
+                    <SymbolIcon Grid.Column="0" Symbol="{x:Bind Icon, Mode=OneWay}" />
+                    <TextBlock
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Text="{x:Bind Title, Mode=OneWay}"
+                        Visibility="{x:Bind IsDefault, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=true}" />
+                </StackPanel>
+            </CommandBar.Content>
+            <AppBarElementContainer VerticalAlignment="Center">
+                <TextBox Text="{x:Bind Path, Mode=TwoWay}" Visibility="{x:Bind IsDefault, Converter={StaticResource BoolToVisibilityConverter}}" />
+            </AppBarElementContainer>
+        </CommandBar>
+
+        <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
                 <ColumnDefinition Width="8*" />

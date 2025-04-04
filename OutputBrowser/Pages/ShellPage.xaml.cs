@@ -1,9 +1,12 @@
 using System;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
+using Microsoft.Windows.ApplicationModel.Resources;
+using OutputBrowser.Models;
 using OutputBrowser.ViewModels;
 
 namespace OutputBrowser.Pages;
@@ -17,6 +20,8 @@ public sealed partial class ShellPage : Page
     public NavigationView NavigationView => _NavigationView;
     public Frame ContentFrame => _ContentFrame;
 
+    public ObservableCollection<WatchesSettingViewModel> Watches { get; } = [];
+
     public ShellPage() {
         _settings = App.GetService<SettingViewModel>();
         InitializeComponent();
@@ -24,15 +29,16 @@ public sealed partial class ShellPage : Page
     }
 
     void ShellPageLoaded(object sender, RoutedEventArgs e) {
-        var firstSelection = _NavigationView.MenuItems
-            .OfType<NavigationViewItem>()
-            .FirstOrDefault(i => OutputPage.Type.Equals(i.Tag));
-        if (firstSelection != null) {
-            firstSelection.Tag = new OutputPage(_settings.Default);
-        }
-        _NavigationView.SelectedItem = firstSelection;
+
+        var defaultWatched = new WatchesSettingViewModel(null, new WatchesSettings {
+            Icon = "Accept", Name = _resourceLoader.GetString("OutputBrowserNavigationViewItem/Content"),
+        }) {
+            Page = new OutputPage(_settings.Default)
+        };
+        Watches.Add(defaultWatched);
+        _NavigationView.SelectedItem = defaultWatched;
         _settings.Watches.CollectionChanged += OnWatchesCollectionChanged;
-        _settings.Watches.ForEach(AddNavigationViewItem);
+        _settings.Watches.ForEach(Watches.Add);
     }
 
     public void Navigate(Type type, object parameter) {
@@ -53,38 +59,19 @@ public sealed partial class ShellPage : Page
             return;  // Clear selection.
         } else if (args.IsSettingsSelected) {
             _ContentFrame.Navigate(typeof(SettingPage), args.RecommendedNavigationTransitionInfo);
-        } else {
-            var selectedItem = (NavigationViewItem)args.SelectedItem;
-            if (selectedItem.Tag is WatchesSettingViewModel watches) {
-                var page = selectedItem.Tag = new OutputPage(watches);
-                _ContentFrame.Content = page;
-            } else if (selectedItem.Tag is OutputPage page) {
-                _ContentFrame.Content = page;
-            }
+        } else if (args.SelectedItem is WatchesSettingViewModel watches) {
+            _ContentFrame.Content = watches.Page ??= new OutputPage(watches);
         }
     }
 
     void OnWatchesCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
         if (e.Action == NotifyCollectionChangedAction.Add) {
-            e.NewItems.OfType<WatchesSettingViewModel>().ForEach(AddNavigationViewItem);
+            e.NewItems.OfType<WatchesSettingViewModel>().ForEach(Watches.Add);
         } else if (e.Action == NotifyCollectionChangedAction.Remove) {
-            e.OldItems.OfType<WatchesSettingViewModel>().ForEach(RemoveNavigationViewItem);
+            e.OldItems.OfType<WatchesSettingViewModel>().ForEach(watches => Watches.Remove(watches));
         }
     }
 
-    void AddNavigationViewItem(WatchesSettingViewModel watch) {
-        _NavigationView.MenuItems.Add(new NavigationViewItem {
-            Icon = new SymbolIcon(watch.Icon),
-            Content = watch.Name,
-            Tag = watch
-        });
-    }
-
-    void RemoveNavigationViewItem(WatchesSettingViewModel watch) {
-        _NavigationView.MenuItems.OfType<NavigationViewItem>()
-            .Where(i => i.Name == watch.Name)
-            .ForEach(i => _NavigationView.MenuItems.Remove(i));
-    }
-
     readonly SettingViewModel _settings;
+    static readonly ResourceLoader _resourceLoader = new();
 }
