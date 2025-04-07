@@ -12,7 +12,7 @@ public partial class SettingViewModel : ObservableRecipient
     [ObservableProperty] public partial ElementTheme Theme { get; set; }
     [ObservableProperty] public partial Controls.SystemBackdrop Backdrop { get; set; }
 
-    public WatchSettingsViewModel Default { get; set; } = new();
+    public WatchSettingsViewModel Default { get; set; } = new(null);
     public ObservableCollection<WatchesSettingViewModel> Watches { get; } = [];
 
     public SettingViewModel(IOptions<Models.OutputBrowserSettings> settings) {
@@ -44,7 +44,8 @@ public partial class SettingViewModel : ObservableRecipient
                     Icon = w.Icon,
                     Name = w.Name,
                     Path = w.Path,
-                    Filters = w.Filters
+                    Filters = w.Filters,
+                    Notification = w.Notification
                 })]
             });
         }

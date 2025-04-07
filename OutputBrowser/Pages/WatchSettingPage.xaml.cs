@@ -39,7 +39,7 @@ namespace OutputBrowser.Pages
 
         [RelayCommand]
         async Task AddWatchSettingsAsync() {
-            var watchSettingsViewModel = new WatchSettingsViewModel();
+            var watchSettingsViewModel = new WatchSettingsViewModel(null);
             watchSettingsViewModel.PropertyChanged += OnWatchSettingPropertyChanged;
             _WatchSettingsDialog.Title = "監視設定追加";
             _WatchSettingsDialog.DataContext = watchSettingsViewModel;
@@ -54,17 +54,18 @@ namespace OutputBrowser.Pages
 
         [RelayCommand]
         void AddWatchSettingsAdd(WatchSettingsViewModel watchSettingsViewModel) {
-            Model.AddWatchSettings(watchSettingsViewModel);
+            watchSettingsViewModel.AddTo(Model);
             _WatchSettingsDialog.Hide();
         }
 
         [RelayCommand]
         async Task OpenWatchSettingsAsync(WatchSettingsViewModel watchSettingsViewModel) {
-            var newWatchSettingsViewModel = new WatchSettingsViewModel {
+            var newWatchSettingsViewModel = new WatchSettingsViewModel(watchSettingsViewModel.Parent) {
                 Icon = watchSettingsViewModel.Icon,
                 Name = watchSettingsViewModel.Name,
                 Path = watchSettingsViewModel.Path,
-                Filters = watchSettingsViewModel.Filters
+                Filters = watchSettingsViewModel.Filters,
+                Notification = watchSettingsViewModel.Notification
             };
             newWatchSettingsViewModel.PropertyChanged += OnWatchSettingPropertyChanged;
             _WatchSettingsDialog.Title = "監視設定更新";
@@ -85,6 +86,7 @@ namespace OutputBrowser.Pages
             watchSettingsViewModel.Name = newWatchSettingsViewModel.Name;
             watchSettingsViewModel.Path = newWatchSettingsViewModel.Path;
             watchSettingsViewModel.Filters = newWatchSettingsViewModel.Filters;
+            watchSettingsViewModel.Notification = newWatchSettingsViewModel.Notification;
             _WatchSettingsDialog.Hide();
         }
 

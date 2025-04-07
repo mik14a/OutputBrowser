@@ -1,5 +1,3 @@
-using System;
-
 namespace OutputBrowser.Models;
 
 public class WatchSettings
@@ -8,4 +6,5 @@ public class WatchSettings
     public string Name { get; set; }
     public string Path { get; set; }
     public string Filters { get; set; }
+    public bool Notification { get; set; }
 }

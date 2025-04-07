@@ -16,6 +16,10 @@
 
     <Page.Resources>
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <converters:EmptyObjectToObjectConverter
+            x:Key="EmptyObjectToObjectConverter"
+            EmptyValue="False"
+            NotEmptyValue="True" />
     </Page.Resources>
 
     <Grid Margin="16">
@@ -25,9 +29,9 @@
         </Grid.RowDefinitions>
 
         <ContentDialog x:Name="_WatchSettingsDialog" PrimaryButtonStyle="{StaticResource AccentButtonStyle}">
-            <ContentDialog.DataContext>
+            <!--<ContentDialog.DataContext>
                 <viewmodel:WatchSettingsViewModel />
-            </ContentDialog.DataContext>
+            </ContentDialog.DataContext>-->
             <ContentDialog.Content>
                 <Grid ColumnSpacing="8">
                     <Grid.ColumnDefinitions>
@@ -49,9 +53,13 @@
                         </Button>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Spacing="8">
-                        <TextBox x:Uid="WatchDialogNameTextBox" Text="{Binding Name, Mode=TwoWay}" />
+                        <TextBox
+                            x:Uid="WatchDialogNameTextBox"
+                            IsReadOnly="{Binding Parent, Converter={StaticResource EmptyObjectToObjectConverter}}"
+                            Text="{Binding Name, Mode=TwoWay}" />
                         <TextBox x:Uid="WatchDialogPathTextBox" Text="{Binding Path, Mode=TwoWay}" />
                         <TextBox x:Uid="WatchDialogFiltersTextBox" Text="{Binding Filters, Mode=TwoWay}" />
+                        <ToggleSwitch x:Uid="WatchDialogNotificationToggleSwitch" IsOn="{Binding Notification, Mode=TwoWay}" />
                     </StackPanel>
                 </Grid>
             </ContentDialog.Content>

@@ -7,9 +7,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.Windows.AppNotifications;
+using OutputBrowser.Helpers;
 using OutputBrowser.ViewModels;
 using WinUIEx;
 
@@ -60,13 +62,13 @@ public partial class App : Application
         _host = builder.Build();
     }
 
-     public void SetElementTheme(ElementTheme value) {
+    public void SetElementTheme(ElementTheme value) {
         if (MainWindow.Content is FrameworkElement root) {
             root.RequestedTheme = value;
         }
     }
 
-     public void SetSystemBackdrop(Controls.SystemBackdrop value) {
+    public void SetSystemBackdrop(Controls.SystemBackdrop value) {
         MainWindow.SystemBackdrop = value switch {
             Controls.SystemBackdrop.Mica => new MicaBackdrop { Kind = Microsoft.UI.Composition.SystemBackdrops.MicaKind.Base },
             Controls.SystemBackdrop.MicaAlt => new MicaBackdrop { Kind = Microsoft.UI.Composition.SystemBackdrops.MicaKind.BaseAlt },
@@ -85,6 +87,11 @@ public partial class App : Application
             Content = new Pages.ShellPage(),
             ExtendsContentIntoTitleBar = true
         };
+
+        var notificationManager = AppNotificationManager.Default;
+        notificationManager.NotificationInvoked += NotificationManagerNotificationInvoked;
+        notificationManager.Register();
+
         var settings = GetService<IOptions<Models.OutputBrowserSettings>>().Value;
         SetElementTheme(Enum.TryParse<ElementTheme>(settings.Theme, out var theme) ? theme : ElementTheme.Default);
         SetSystemBackdrop(Enum.TryParse<Controls.SystemBackdrop>(settings.Backdrop, out var backdrop) ? backdrop : Controls.SystemBackdrop.Mica);
@@ -93,6 +100,17 @@ public partial class App : Application
         _window.SetTitleBar(shell.AppTitleBar);
         _window.SetWindowSize(600, 800);
         _window.Activate();
+    }
+
+    void NotificationManagerNotificationInvoked(AppNotificationManager sender, AppNotificationActivatedEventArgs args) {
+        HandleNotification(args);
+    }
+
+    void HandleNotification(AppNotificationActivatedEventArgs args) {
+        var dispatcherQueue = _window?.DispatcherQueue ?? DispatcherQueue.GetForCurrentThread();
+        dispatcherQueue.TryEnqueue(delegate {
+            WindowHelper.ShowWindow(_window);
+        });
     }
 
 #if !DEBUG
