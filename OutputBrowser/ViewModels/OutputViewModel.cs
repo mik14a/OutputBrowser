@@ -15,12 +15,13 @@ public partial class OutputViewModel : ObservableRecipient
 {
     public string Sender { get; }
     public ImageSource Icon { get; }
-    public bool IsVisibleSender { get; }
     public string ImagePath { get; }
     public string FileName { get; }
     public string DisplayName { get; }
     public DateTime DateModified { get; }
     public long Size { get; }
+
+    public bool IsDefault { get; }
 
     [ObservableProperty]
     public partial bool VisibleContactInfo { get; set; } = false;
@@ -34,7 +35,6 @@ public partial class OutputViewModel : ObservableRecipient
     public OutputViewModel(string sender, ImageSource icon, string basePath, string fullPath) {
         Sender = sender;
         Icon = icon;
-        IsVisibleSender = !sender.Equals("Default", StringComparison.InvariantCultureIgnoreCase);
         ImagePath = fullPath;
         FileName = Path.GetFileName(fullPath);
         DisplayName = Path.GetRelativePath(basePath, fullPath);
@@ -45,6 +45,7 @@ public partial class OutputViewModel : ObservableRecipient
         } catch (FileNotFoundException ex) {
             Debug.WriteLine(ex.Message);  // File was deleted
         }
+        IsDefault = !sender.Equals("Default", StringComparison.InvariantCultureIgnoreCase);
     }
 
     public async Task<bool> InitializeAsync() {

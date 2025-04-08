@@ -147,6 +147,7 @@
   <data name="WatchNameSettingsCard.Header" xml:space="preserve"><value>監視名</value></data>
   <data name="WatchTargetSettingsExpander.Header" xml:space="preserve"><value>監視対象</value></data>
   <data name="WatchDialogIconTextBlock.Text" xml:space="preserve"><value>アイコン</value></data>
+  <data name="WatchDialogDeleteImageButtonContent.Text" xml:space="preserve"><value>削除</value></data>
   <data name="WatchDialogNameTextBox.Header" xml:space="preserve"><value>名前</value></data>
   <data name="WatchDialogPathTextBox.Header" xml:space="preserve"><value>パス</value></data>
   <data name="WatchDialogFiltersTextBox.Header" xml:space="preserve"><value>フィルタ</value></data>

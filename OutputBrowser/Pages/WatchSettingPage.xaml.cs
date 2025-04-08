@@ -111,6 +111,11 @@ namespace OutputBrowser.Pages
         }
 
         [RelayCommand]
+        void DeleteImage(WatchSettingsViewModel watchSettingsViewModel) {
+            watchSettingsViewModel.Icon = null;
+        }
+
+        [RelayCommand]
         void Update() {
             if (IsNewWatchesSetting) {
                 Model.Add();

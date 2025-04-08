@@ -147,6 +147,7 @@
   <data name="WatchNameSettingsCard.Header" xml:space="preserve"><value>Watch name</value></data>
   <data name="WatchTargetSettingsExpander.Header" xml:space="preserve"><value>Watch target</value></data>
   <data name="WatchDialogIconTextBlock.Text" xml:space="preserve"><value>Icon</value></data>
+  <data name="WatchDialogDeleteImageButtonContent.Text" xml:space="preserve"><value>Delete</value></data>
   <data name="WatchDialogNameTextBox.Header" xml:space="preserve"><value>Name</value></data>
   <data name="WatchDialogPathTextBox.Header" xml:space="preserve"><value>Path</value></data>
   <data name="WatchDialogFiltersTextBox.Header" xml:space="preserve"><value>Filters</value></data>

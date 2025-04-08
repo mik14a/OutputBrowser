@@ -38,20 +38,39 @@
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
-                    <StackPanel Spacing="4">
-                        <TextBlock x:Uid="WatchDialogIconTextBlock" />
+                    <Grid VerticalAlignment="Top" RowSpacing="8">
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <TextBlock
+                            x:Uid="WatchDialogIconTextBlock"
+                            Grid.Row="0"
+                            HorizontalAlignment="Center" />
                         <Button
-                            Grid.Column="0"
+                            Grid.Row="1"
                             Width="40"
                             Height="40"
                             Padding="0"
+                            HorizontalAlignment="Center"
                             BorderBrush="{StaticResource AccentFillColorDefaultBrush}"
                             Command="{x:Bind SelectImageCommand}"
                             CommandParameter="{Binding}"
                             CornerRadius="20">
                             <Image Source="{Binding IconSource, Mode=OneWay}" />
                         </Button>
-                    </StackPanel>
+                        <Button
+                            Grid.Row="2"
+                            HorizontalAlignment="Center"
+                            Command="{x:Bind DeleteImageCommand}"
+                            CommandParameter="{Binding}">
+                            <StackPanel>
+                                <SymbolIcon Symbol="Delete" />
+                                <TextBlock x:Uid="WatchDialogDeleteImageButtonContent" />
+                            </StackPanel>
+                        </Button>
+                    </Grid>
                     <StackPanel Grid.Column="1" Spacing="8">
                         <TextBox
                             x:Uid="WatchDialogNameTextBox"
