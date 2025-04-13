@@ -27,9 +27,9 @@
             Canvas.ZIndex="1"
             IsHitTestVisible="True">
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0" />
                 <ColumnDefinition />
-                <ColumnDefinition />
-                <ColumnDefinition />
+                <ColumnDefinition Width="0" />
             </Grid.ColumnDefinitions>
             <StackPanel
                 Grid.Column="1"
@@ -37,8 +37,17 @@
                 VerticalAlignment="Center"
                 Orientation="Horizontal"
                 Spacing="4">
-                <Image Width="16" Source="ms-appx:///Assets/Tiles/TitlebarLogo.png" />
-                <TextBlock x:Uid="AppTitleTextBlock" Style="{StaticResource CaptionTextBlockStyle}" />
+                <ToggleButton
+                    x:Name="_AlwaysOnTop"
+                    Padding="4"
+                    Click="OnAlwaysOnTopClick"
+                    Style="{StaticResource ToggleButtonRevealStyle}">
+                    <Image Width="16" Source="ms-appx:///Assets/Tiles/TitlebarLogo.png" />
+                </ToggleButton>
+                <TextBlock
+                    x:Uid="AppTitleTextBlock"
+                    VerticalAlignment="Center"
+                    Style="{StaticResource CaptionTextBlockStyle}" />
             </StackPanel>
         </Grid>
         <NavigationView

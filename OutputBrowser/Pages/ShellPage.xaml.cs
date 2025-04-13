@@ -8,6 +8,7 @@ using Microsoft.UI.Xaml.Navigation;
 using Microsoft.Windows.ApplicationModel.Resources;
 using OutputBrowser.Models;
 using OutputBrowser.ViewModels;
+using WinUIEx;
 
 namespace OutputBrowser.Pages;
 
@@ -70,6 +71,10 @@ public sealed partial class ShellPage : Page
         } else if (e.Action == NotifyCollectionChangedAction.Remove) {
             e.OldItems.OfType<WatchesSettingsViewModel>().ForEach(watches => Watches.Remove(watches));
         }
+    }
+
+    void OnAlwaysOnTopClick(object sender, RoutedEventArgs e) {
+        App.MainWindow.SetIsAlwaysOnTop(_AlwaysOnTop.IsChecked == true);
     }
 
     readonly SettingViewModel _settings;
