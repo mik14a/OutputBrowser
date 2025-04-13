@@ -152,6 +152,9 @@
   <data name="WatchDialogPathTextBox.Header" xml:space="preserve"><value>Path</value></data>
   <data name="WatchDialogFiltersTextBox.Header" xml:space="preserve"><value>Filters</value></data>
   <data name="WatchDialogFiltersTextBox.PlaceholderText" xml:space="preserve"><value>*.png;*.jpg;*.jpeg</value></data>
+  <data name="WatchDialogFormatTextBox.Header" xml:space="preserve"><value>Message format</value></data>
+  <data name="WatchDialogFormatTextBox.PlaceholderText" xml:space="preserve"><value>{{name}}, {{path}}</value></data>
+  <data name="WatchDialogFormatPlaceholderTextBlock.Text" xml:space="preserve"><value>Placeholders can be used. If empty, the relative path will be output. Example: {{name}} was updated.&#xa;{{name}}:file name, {{path}}:relative path</value></data>
   <data name="WatchDialogNotificationToggleSwitch.Header" xml:space="preserve"><value>Enable notifications</value></data>
   <data name="DeleteButtonContent.Text" xml:space="preserve"><value>Delete</value></data>
   <data name="CancelButtonContent.Text" xml:space="preserve"><value>Cancel</value></data>
@@ -165,5 +168,15 @@
   <!-- Shell page -->
   <data name="AppTitleTextBlock.Text" xml:space="preserve"><value>OutputBrowser</value></data>
   <data name="OutputBrowserNavigationViewItem.Content" xml:space="preserve"><value>Output Browser</value></data>
+
+  <!-- WatchSettingsDialog -->
+  <data name="WatchSettingsDialog.AddTitle" xml:space="preserve"><value>Add Watch Settings</value></data>
+  <data name="WatchSettingsDialog.UpdateTitle" xml:space="preserve"><value>Update Watch Settings</value></data>
+  <data name="WatchSettingsDialog.AddButton" xml:space="preserve"><value>Add</value></data>
+  <data name="WatchSettingsDialog.UpdateButton" xml:space="preserve"><value>Update</value></data>
+  <data name="WatchSettingsDialog.CancelButton" xml:space="preserve"><value>Cancel</value></data>
+
+  <!-- WatchSettingsViewModel defaults -->
+  <data name="WatchSettingsViewModel.DefaultName" xml:space="preserve"><value>New Watch</value></data>
 
 </root>

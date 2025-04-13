@@ -60,7 +60,7 @@ public sealed partial class SettingPage : Page
     }
 
     [RelayCommand]
-    void SelectWatches(WatchesSettingViewModel watchesSettingViewModel) {
+    void SelectWatches(WatchesSettingsViewModel watchesSettingViewModel) {
         App.Current.Shell.Navigate(typeof(WatchSettingPage), (false, watchesSettingViewModel));
     }
 

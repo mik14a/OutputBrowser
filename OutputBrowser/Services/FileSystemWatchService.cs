@@ -28,6 +28,8 @@ public partial class FileSystemWatchService : IDisposable
         }
     }
 
+    public string Format { get; set; }
+
     public FileSystemWatchService(string name, string path, string filters) {
         Name = name;
         _watcher = new(path) {

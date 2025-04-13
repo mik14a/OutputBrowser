@@ -5,7 +5,7 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace OutputBrowser.ViewModels;
 
-public partial class WatchesSettingViewModel : ObservableRecipient
+public partial class WatchesSettingsViewModel : ObservableRecipient
 {
     public Page Page { get; set; }
 
@@ -17,7 +17,7 @@ public partial class WatchesSettingViewModel : ObservableRecipient
 
     public ObservableCollection<WatchSettingsViewModel> Watches { get; } = [];
 
-    public WatchesSettingViewModel(SettingViewModel setting, Models.WatchesSettings watch) {
+    public WatchesSettingsViewModel(SettingViewModel setting, Models.WatchesSettings watch) {
         _setting = setting;
         _watch = watch;
         Icon = Enum.TryParse<Symbol>(watch.Icon, out var icon) ? icon : Symbol.Link;
@@ -27,6 +27,7 @@ public partial class WatchesSettingViewModel : ObservableRecipient
             Name = w.Name,
             Path = w.Path,
             Filters = w.Filters,
+            Format = w.Format,
             Notification = w.Notification
         }));
     }
@@ -54,6 +55,7 @@ public partial class WatchesSettingViewModel : ObservableRecipient
                 Name = watch.Name,
                 Path = watch.Path,
                 Filters = watch.Filters,
+                Format = watch.Format,
                 Notification = watch.Notification
             });
         }

@@ -152,6 +152,9 @@
   <data name="WatchDialogPathTextBox.Header" xml:space="preserve"><value>パス</value></data>
   <data name="WatchDialogFiltersTextBox.Header" xml:space="preserve"><value>フィルタ</value></data>
   <data name="WatchDialogFiltersTextBox.PlaceholderText" xml:space="preserve"><value>*.png;*.jpg;*.jpeg</value></data>
+  <data name="WatchDialogFormatTextBox.Header" xml:space="preserve"><value>メッセージフォーマット</value></data>
+  <data name="WatchDialogFormatTextBox.PlaceholderText" xml:space="preserve"><value>{{name}}, {{path}}</value></data>
+  <data name="WatchDialogFormatPlaceholderTextBlock.Text" xml:space="preserve"><value>プレースホルダが使えます。空の場合には相対パスが出力されます。例: {{name}} が更新されました。&#xa;{{name}}:ファイル名, {{path}}:相対パス</value></data>
   <data name="WatchDialogNotificationToggleSwitch.Header" xml:space="preserve"><value>通知</value></data>
   <data name="DeleteButtonContent.Text" xml:space="preserve"><value>削除</value></data>
   <data name="CancelButtonContent.Text" xml:space="preserve"><value>キャンセル</value></data>
@@ -165,5 +168,15 @@
   <!-- Shell page -->
   <data name="AppTitleTextBlock.Text" xml:space="preserve"><value>OutputBrowser</value></data>
   <data name="OutputBrowserNavigationViewItem.Content" xml:space="preserve"><value>出力ブラウザ</value></data>
+
+  <!-- WatchSettingsDialog -->
+  <data name="WatchSettingsDialog.AddTitle" xml:space="preserve"><value>監視設定追加</value></data>
+  <data name="WatchSettingsDialog.UpdateTitle" xml:space="preserve"><value>監視設定更新</value></data>
+  <data name="WatchSettingsDialog.AddButton" xml:space="preserve"><value>追加</value></data>
+  <data name="WatchSettingsDialog.UpdateButton" xml:space="preserve"><value>更新</value></data>
+  <data name="WatchSettingsDialog.CancelButton" xml:space="preserve"><value>キャンセル</value></data>
+
+  <!-- WatchSettingsViewModel defaults -->
+  <data name="WatchSettingsViewModel.DefaultName" xml:space="preserve"><value>新規監視</value></data>
 
 </root>

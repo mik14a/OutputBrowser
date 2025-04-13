@@ -1,15 +1,13 @@
 using System;
 using System.ComponentModel;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
+using Microsoft.Windows.ApplicationModel.Resources;
+using OutputBrowser.Models;
 using OutputBrowser.ViewModels;
-using Windows.Storage.FileProperties;
-using Windows.Storage.Pickers;
-using WinRT.Interop;
 
 namespace OutputBrowser.Pages
 {
@@ -23,7 +21,7 @@ namespace OutputBrowser.Pages
 
         public bool IsNewWatchesSetting { get; set; }
 
-        public WatchesSettingViewModel Model { get; private set; }
+        public WatchesSettingsViewModel Model { get; private set; }
 
         public WatchSettingPage() {
             InitializeComponent();
@@ -32,19 +30,23 @@ namespace OutputBrowser.Pages
 
         protected override void OnNavigatedTo(NavigationEventArgs e) {
             var parameter = e.Parameter;
-            (IsNewWatchesSetting, Model) = (ValueTuple<bool, WatchesSettingViewModel>)parameter;
+            (IsNewWatchesSetting, Model) = (ValueTuple<bool, WatchesSettingsViewModel>)parameter;
             _Icon.SelectedItem = Icons.FirstOrDefault(i => i.Icon == Model.Icon);
             base.OnNavigatedTo(e);
         }
 
         [RelayCommand]
         async Task AddWatchSettingsAsync() {
-            var watchSettingsViewModel = new WatchSettingsViewModel(null);
+            var watchSettingsViewModel = new WatchSettingsViewModel(null) {
+                Icon = null,
+                Name = _resourceLoader.GetString("WatchSettingsViewModel/DefaultName"),
+                Path = WatchSettings.Default.Path,
+                Filters = WatchSettings.Default.Filters,
+                Format = WatchSettings.Default.Format,
+                Notification = WatchSettings.Default.Notification
+            };
             watchSettingsViewModel.PropertyChanged += OnWatchSettingPropertyChanged;
-            _WatchSettingsDialog.Title = "監視設定追加";
-            _WatchSettingsDialog.DataContext = watchSettingsViewModel;
-            _WatchSettingsDialog.PrimaryButtonText = "追加";
-            _WatchSettingsDialog.CloseButtonText = "キャンセル";
+            _WatchSettingsDialog.Model = watchSettingsViewModel;
             _WatchSettingsDialog.PrimaryButtonCommand = AddWatchSettingsAddCommand;
             _WatchSettingsDialog.PrimaryButtonCommandParameter = watchSettingsViewModel;
             _WatchSettingsDialog.IsPrimaryButtonEnabled = false;
@@ -65,13 +67,11 @@ namespace OutputBrowser.Pages
                 Name = watchSettingsViewModel.Name,
                 Path = watchSettingsViewModel.Path,
                 Filters = watchSettingsViewModel.Filters,
+                Format = watchSettingsViewModel.Format,
                 Notification = watchSettingsViewModel.Notification
             };
             newWatchSettingsViewModel.PropertyChanged += OnWatchSettingPropertyChanged;
-            _WatchSettingsDialog.Title = "監視設定更新";
-            _WatchSettingsDialog.DataContext = newWatchSettingsViewModel;
-            _WatchSettingsDialog.PrimaryButtonText = "更新";
-            _WatchSettingsDialog.CloseButtonText = "キャンセル";
+            _WatchSettingsDialog.Model = newWatchSettingsViewModel;
             _WatchSettingsDialog.PrimaryButtonCommand = OpenWatchSettingsUpdateCommand;
             _WatchSettingsDialog.PrimaryButtonCommandParameter = (watchSettingsViewModel, newWatchSettingsViewModel);
             _WatchSettingsDialog.IsPrimaryButtonEnabled = true;
@@ -86,33 +86,9 @@ namespace OutputBrowser.Pages
             watchSettingsViewModel.Name = newWatchSettingsViewModel.Name;
             watchSettingsViewModel.Path = newWatchSettingsViewModel.Path;
             watchSettingsViewModel.Filters = newWatchSettingsViewModel.Filters;
+            watchSettingsViewModel.Format = newWatchSettingsViewModel.Format;
             watchSettingsViewModel.Notification = newWatchSettingsViewModel.Notification;
             _WatchSettingsDialog.Hide();
-        }
-
-        [RelayCommand]
-        async Task SelectImage(WatchSettingsViewModel watchSettingsViewModel) {
-            var picker = new FileOpenPicker {
-                ViewMode = PickerViewMode.Thumbnail,
-                SuggestedStartLocation = PickerLocationId.PicturesLibrary
-            };
-            picker.FileTypeFilter.Add(".png");
-            picker.FileTypeFilter.Add(".jpg");
-            picker.FileTypeFilter.Add(".jpeg");
-            InitializeWithWindow.Initialize(picker, WindowNative.GetWindowHandle(App.MainWindow));
-            var file = await picker.PickSingleFileAsync();
-            if (file != null) {
-                var thumbnail = await file.GetThumbnailAsync(ThumbnailMode.MusicView, 120, ThumbnailOptions.ResizeThumbnail);
-                using var stream = thumbnail.AsStreamForRead();
-                var buffer = new byte[stream.Length];
-                stream.ReadExactly(buffer, 0, buffer.Length);
-                watchSettingsViewModel.Icon = buffer;
-            }
-        }
-
-        [RelayCommand]
-        void DeleteImage(WatchSettingsViewModel watchSettingsViewModel) {
-            watchSettingsViewModel.Icon = null;
         }
 
         [RelayCommand]
@@ -138,10 +114,10 @@ namespace OutputBrowser.Pages
 
         void OnWatchSettingPropertyChanged(object sender, PropertyChangedEventArgs e) {
             var vm = (WatchSettingsViewModel)sender;
-            _WatchSettingsDialog.IsPrimaryButtonEnabled
-                = !string.IsNullOrEmpty(vm.Name)
-                && !string.IsNullOrEmpty(vm.Path)
-                && !string.IsNullOrEmpty(vm.Filters);
+            if (e.PropertyName != nameof(vm.IsValid)) return;
+            _WatchSettingsDialog.IsPrimaryButtonEnabled = vm.IsValid;
         }
+
+        static readonly ResourceLoader _resourceLoader = new();
     }
 }

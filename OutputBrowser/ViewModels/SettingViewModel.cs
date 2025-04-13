@@ -13,7 +13,7 @@ public partial class SettingViewModel : ObservableRecipient
     [ObservableProperty] public partial Controls.SystemBackdrop Backdrop { get; set; }
 
     public WatchSettingsViewModel Default { get; set; } = new(null);
-    public ObservableCollection<WatchesSettingViewModel> Watches { get; } = [];
+    public ObservableCollection<WatchesSettingsViewModel> Watches { get; } = [];
 
     public SettingViewModel(IOptions<Models.OutputBrowserSettings> settings) {
         _settings = settings.Value;
@@ -25,8 +25,9 @@ public partial class SettingViewModel : ObservableRecipient
         Backdrop = Enum.TryParse<Controls.SystemBackdrop>(_settings.Backdrop, out var backdrop) ? backdrop : Controls.SystemBackdrop.Mica;
         Default.Path = _settings.Default.Path;
         Default.Filters = _settings.Default.Filters;
+        Default.Format = _settings.Default.Format;
         foreach (var watch in _settings.Watches) {
-            Watches.Add(new WatchesSettingViewModel(this, watch.Value));
+            Watches.Add(new WatchesSettingsViewModel(this, watch.Value));
         }
     }
 
@@ -35,34 +36,36 @@ public partial class SettingViewModel : ObservableRecipient
         _settings.Backdrop = Backdrop.ToString();
         _settings.Default.Path = Default.Path;
         _settings.Default.Filters = Default.Filters;
+        _settings.Default.Format = Default.Format;
         _settings.Watches.Clear();
         foreach (var watch in Watches) {
             _settings.Watches.Add(watch.Name, new Models.WatchesSettings {
                 Icon = watch.Icon.ToString(),
                 Name = watch.Name,
                 Watches = [.. watch.Watches.Select(w => new Models.WatchSettings {
-                    Icon = w.Icon,
+                    Icon = w.Icon != null && 0 < w.Icon.Length ? w.Icon : null,
                     Name = w.Name,
                     Path = w.Path,
                     Filters = w.Filters,
+                    Format = w.Format,
                     Notification = w.Notification
                 })]
             });
         }
     }
 
-    public WatchesSettingViewModel CreateWatchesSetting() {
+    public WatchesSettingsViewModel CreateWatchesSetting() {
         var watch = new Models.WatchesSettings() {
             Name = "新規監視"
         };
-        return new WatchesSettingViewModel(this, watch);
+        return new WatchesSettingsViewModel(this, watch);
     }
 
-    public void AddWatchesSetting(WatchesSettingViewModel watchesSettingViewModel) {
+    public void AddWatchesSetting(WatchesSettingsViewModel watchesSettingViewModel) {
         Watches.Add(watchesSettingViewModel);
     }
 
-    public void RemoveWatchesSetting(WatchesSettingViewModel watchesSettingViewModel) {
+    public void RemoveWatchesSetting(WatchesSettingsViewModel watchesSettingViewModel) {
         Watches.Remove(watchesSettingViewModel);
     }
 

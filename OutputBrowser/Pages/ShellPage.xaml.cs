@@ -20,7 +20,7 @@ public sealed partial class ShellPage : Page
     public NavigationView NavigationView => _NavigationView;
     public Frame ContentFrame => _ContentFrame;
 
-    public ObservableCollection<WatchesSettingViewModel> Watches { get; } = [];
+    public ObservableCollection<WatchesSettingsViewModel> Watches { get; } = [];
 
     public ShellPage() {
         _settings = App.GetService<SettingViewModel>();
@@ -30,7 +30,7 @@ public sealed partial class ShellPage : Page
 
     void ShellPageLoaded(object sender, RoutedEventArgs e) {
 
-        var defaultWatched = new WatchesSettingViewModel(null, new WatchesSettings {
+        var defaultWatched = new WatchesSettingsViewModel(null, new WatchesSettings {
             Icon = "Accept", Name = _resourceLoader.GetString("OutputBrowserNavigationViewItem/Content"),
         }) {
             Page = new OutputPage(_settings.Default)
@@ -59,16 +59,16 @@ public sealed partial class ShellPage : Page
             return;  // Clear selection.
         } else if (args.IsSettingsSelected) {
             _ContentFrame.Navigate(typeof(SettingPage), args.RecommendedNavigationTransitionInfo);
-        } else if (args.SelectedItem is WatchesSettingViewModel watches) {
+        } else if (args.SelectedItem is WatchesSettingsViewModel watches) {
             _ContentFrame.Content = watches.Page ??= new OutputPage(watches);
         }
     }
 
     void OnWatchesCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
         if (e.Action == NotifyCollectionChangedAction.Add) {
-            e.NewItems.OfType<WatchesSettingViewModel>().ForEach(Watches.Add);
+            e.NewItems.OfType<WatchesSettingsViewModel>().ForEach(Watches.Add);
         } else if (e.Action == NotifyCollectionChangedAction.Remove) {
-            e.OldItems.OfType<WatchesSettingViewModel>().ForEach(watches => Watches.Remove(watches));
+            e.OldItems.OfType<WatchesSettingsViewModel>().ForEach(watches => Watches.Remove(watches));
         }
     }
 

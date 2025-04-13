@@ -4,10 +4,14 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
+using Windows.ApplicationModel.DataTransfer;
 using Windows.Graphics.Imaging;
 using Windows.Storage;
+using Windows.Storage.Streams;
+using Windows.System;
 
 namespace OutputBrowser.ViewModels;
 
@@ -32,12 +36,16 @@ public partial class OutputViewModel : ObservableRecipient
     [ObservableProperty]
     public partial string ContactInfo { get; set; }
 
-    public OutputViewModel(string sender, ImageSource icon, string basePath, string fullPath) {
+    public OutputViewModel(string sender, ImageSource icon, string format, string basePath, string fullPath) {
         Sender = sender;
         Icon = icon;
         ImagePath = fullPath;
         FileName = Path.GetFileName(fullPath);
-        DisplayName = Path.GetRelativePath(basePath, fullPath);
+        var relativePath = Path.GetRelativePath(basePath, fullPath);
+        DisplayName = !string.IsNullOrWhiteSpace(format)
+                      ? format.Replace(Models.WatchSettings.FileName, FileName, StringComparison.OrdinalIgnoreCase)
+                              .Replace(Models.WatchSettings.FilePath, relativePath, StringComparison.OrdinalIgnoreCase)
+                      : relativePath;
         var fileInfo = new FileInfo(fullPath);
         try {
             DateModified = fileInfo.LastWriteTime;
@@ -45,7 +53,7 @@ public partial class OutputViewModel : ObservableRecipient
         } catch (FileNotFoundException ex) {
             Debug.WriteLine(ex.Message);  // File was deleted
         }
-        IsDefault = !sender.Equals("Default", StringComparison.InvariantCultureIgnoreCase);
+        IsDefault = !sender.Equals("Default", StringComparison.OrdinalIgnoreCase);
     }
 
     public async Task<bool> InitializeAsync() {
@@ -89,5 +97,51 @@ public partial class OutputViewModel : ObservableRecipient
             Debug.WriteLine(ex.Message);  // Not a image file
         }
         return false;
+    }
+
+    [RelayCommand]
+    async Task OpenWithDefaultAppAsync() {
+        var imageFile = await StorageFile.GetFileFromPathAsync(ImagePath);
+        await Launcher.LaunchFileAsync(imageFile);
+    }
+
+    [RelayCommand]
+    async Task OpenFolderAsync() {
+        var imageFile = await StorageFile.GetFileFromPathAsync(ImagePath);
+        var imageFolder = await StorageFolder.GetFolderFromPathAsync(System.IO.Path.GetDirectoryName(ImagePath));
+        var folderLauncherOptions = new FolderLauncherOptions();
+        folderLauncherOptions.ItemsToSelect.Add(imageFile);
+        await Launcher.LaunchFolderAsync(imageFolder, folderLauncherOptions);
+    }
+
+    [RelayCommand]
+    async Task CopyAsync() {
+        var imageFile = await StorageFile.GetFileFromPathAsync(ImagePath);
+        var dataPackage = new DataPackage();
+        dataPackage.SetStorageItems([imageFile]);
+        Clipboard.SetContent(dataPackage);
+    }
+
+    [RelayCommand]
+    async Task CopyImageAsync() {
+        var imageFile = await StorageFile.GetFileFromPathAsync(ImagePath);
+        var stream = await imageFile.OpenReadAsync();
+        var dataPackage = new DataPackage();
+        dataPackage.SetBitmap(RandomAccessStreamReference.CreateFromStream(stream));
+        Clipboard.SetContent(dataPackage);
+    }
+
+    [RelayCommand]
+    void CopyPath() {
+        var dataPackage = new DataPackage();
+        dataPackage.SetText(ImagePath);
+        Clipboard.SetContent(dataPackage);
+    }
+
+    [RelayCommand]
+    void CopyPrompt() {
+        var dataPackage = new DataPackage();
+        dataPackage.SetText(ContactInfo);
+        Clipboard.SetContent(dataPackage);
     }
 }

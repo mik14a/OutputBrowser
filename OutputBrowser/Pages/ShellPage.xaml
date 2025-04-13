@@ -50,7 +50,7 @@
             PaneDisplayMode="LeftMinimal"
             SelectionChanged="OnNavigationViewSelectionChanged">
             <NavigationView.MenuItemTemplate>
-                <DataTemplate x:DataType="viewmodels:WatchesSettingViewModel">
+                <DataTemplate x:DataType="viewmodels:WatchesSettingsViewModel">
                     <NavigationViewItem Content="{x:Bind Name, Mode=OneWay}" Tag="{x:Bind}">
                         <NavigationViewItem.Icon>
                             <SymbolIcon Symbol="{x:Bind Icon, Mode=OneWay}" />

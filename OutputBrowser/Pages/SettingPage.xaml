@@ -76,7 +76,7 @@
                         </StackPanel>
                     </Button>
                     <toolkit:SettingsExpander.ItemTemplate>
-                        <DataTemplate x:DataType="viewmodel:WatchesSettingViewModel">
+                        <DataTemplate x:DataType="viewmodel:WatchesSettingsViewModel">
                             <toolkit:SettingsCard
                                 Command="{Binding ElementName=_Page, Path=SelectWatchesCommand}"
                                 CommandParameter="{x:Bind}"

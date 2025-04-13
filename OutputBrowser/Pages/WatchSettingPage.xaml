@@ -5,6 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:converters="using:CommunityToolkit.WinUI.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:dialog="using:OutputBrowser.Dialogs"
     xmlns:local="using:OutputBrowser.Pages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:toolkit="using:CommunityToolkit.WinUI.Controls"
@@ -28,61 +29,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <ContentDialog x:Name="_WatchSettingsDialog" PrimaryButtonStyle="{StaticResource AccentButtonStyle}">
-            <!--<ContentDialog.DataContext>
-                <viewmodel:WatchSettingsViewModel />
-            </ContentDialog.DataContext>-->
-            <ContentDialog.Content>
-                <Grid ColumnSpacing="8">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition />
-                    </Grid.ColumnDefinitions>
-                    <Grid VerticalAlignment="Top" RowSpacing="8">
-                        <Grid.RowDefinitions>
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                        </Grid.RowDefinitions>
-                        <TextBlock
-                            x:Uid="WatchDialogIconTextBlock"
-                            Grid.Row="0"
-                            HorizontalAlignment="Center" />
-                        <Button
-                            Grid.Row="1"
-                            Width="40"
-                            Height="40"
-                            Padding="0"
-                            HorizontalAlignment="Center"
-                            BorderBrush="{StaticResource AccentFillColorDefaultBrush}"
-                            Command="{x:Bind SelectImageCommand}"
-                            CommandParameter="{Binding}"
-                            CornerRadius="20">
-                            <Image Source="{Binding IconSource, Mode=OneWay}" />
-                        </Button>
-                        <Button
-                            Grid.Row="2"
-                            HorizontalAlignment="Center"
-                            Command="{x:Bind DeleteImageCommand}"
-                            CommandParameter="{Binding}">
-                            <StackPanel>
-                                <SymbolIcon Symbol="Delete" />
-                                <TextBlock x:Uid="WatchDialogDeleteImageButtonContent" />
-                            </StackPanel>
-                        </Button>
-                    </Grid>
-                    <StackPanel Grid.Column="1" Spacing="8">
-                        <TextBox
-                            x:Uid="WatchDialogNameTextBox"
-                            IsReadOnly="{Binding Parent, Converter={StaticResource EmptyObjectToObjectConverter}}"
-                            Text="{Binding Name, Mode=TwoWay}" />
-                        <TextBox x:Uid="WatchDialogPathTextBox" Text="{Binding Path, Mode=TwoWay}" />
-                        <TextBox x:Uid="WatchDialogFiltersTextBox" Text="{Binding Filters, Mode=TwoWay}" />
-                        <ToggleSwitch x:Uid="WatchDialogNotificationToggleSwitch" IsOn="{Binding Notification, Mode=TwoWay}" />
-                    </StackPanel>
-                </Grid>
-            </ContentDialog.Content>
-        </ContentDialog>
+        <dialog:WatchSettingsDialog x:Name="_WatchSettingsDialog" DefaultButton="Primary" />
 
         <ScrollView>
             <StackPanel>

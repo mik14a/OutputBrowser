@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentDialog
+    x:Class="OutputBrowser.Dialogs.WatchSettingsDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:OutputBrowser.Dialogs"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DataContext="{d:DesignInstance Type=local:WatchSettingsDialog}"
+    mc:Ignorable="d">
+
+    <Grid ColumnSpacing="8">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Grid VerticalAlignment="Top" RowSpacing="8">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <TextBlock
+                x:Uid="WatchDialogIconTextBlock"
+                Grid.Row="0"
+                HorizontalAlignment="Center" />
+            <Button
+                Grid.Row="1"
+                Width="40"
+                Height="40"
+                Padding="0"
+                HorizontalAlignment="Center"
+                BorderBrush="{StaticResource AccentFillColorDefaultBrush}"
+                Command="{x:Bind SelectImageCommand}"
+                CornerRadius="20">
+                <Image Source="{x:Bind Model.IconSource, Mode=OneWay}" />
+            </Button>
+            <Button
+                Grid.Row="2"
+                HorizontalAlignment="Center"
+                Command="{x:Bind DeleteImageCommand}">
+                <StackPanel>
+                    <SymbolIcon Symbol="Delete" />
+                    <TextBlock x:Uid="WatchDialogDeleteImageButtonContent" />
+                </StackPanel>
+            </Button>
+        </Grid>
+        <Grid Grid.Column="1" RowSpacing="8">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <TextBox
+                x:Uid="WatchDialogNameTextBox"
+                Grid.Row="0"
+                IsReadOnly="{x:Bind Model.Parent, Converter={StaticResource EmptyObjectToObjectConverter}}"
+                Text="{x:Bind Model.Name, Mode=TwoWay}" />
+            <StackPanel Grid.Row="1" Orientation="Horizontal">
+                <TextBox
+                    x:Uid="WatchDialogPathTextBox"
+                    CornerRadius="4,0,0,4"
+                    Text="{x:Bind Model.Path, Mode=TwoWay}" />
+                <Button
+                    VerticalAlignment="Bottom"
+                    Command="{x:Bind SelectWatchPathCommand}"
+                    CornerRadius="0,4,4,0">
+                    <SymbolIcon Symbol="Folder" />
+                </Button>
+            </StackPanel>
+            <TextBox
+                x:Uid="WatchDialogFiltersTextBox"
+                Grid.Row="2"
+                Text="{x:Bind Model.Filters, Mode=TwoWay}" />
+            <StackPanel Grid.Row="3">
+                <TextBox
+                    x:Uid="WatchDialogFormatTextBox"
+                    AcceptsReturn="True"
+                    Text="{x:Bind Model.Format, Mode=TwoWay}" />
+                <TextBlock
+                    x:Uid="WatchDialogFormatPlaceholderTextBlock"
+                    Grid.Row="4"
+                    Margin="8"
+                    Style="{StaticResource CaptionTextBlockStyle}" />
+            </StackPanel>
+            <ToggleSwitch
+                x:Uid="WatchDialogNotificationToggleSwitch"
+                Grid.Row="4"
+                IsOn="{x:Bind Model.Notification, Mode=TwoWay}" />
+        </Grid>
+    </Grid>
+</ContentDialog>

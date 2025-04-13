@@ -10,7 +10,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media;
 using Microsoft.Windows.AppNotifications;
 using Microsoft.Windows.AppNotifications.Builder;
 using OutputBrowser.Extensions;
@@ -59,7 +58,7 @@ public sealed partial class OutputPage : Page, IDisposable
         _Outputs.Loaded += OnOutputsLoaded;
     }
 
-    public OutputPage(WatchesSettingViewModel watches) {
+    public OutputPage(WatchesSettingsViewModel watches) {
         Icon = watches.Icon;
         Title = watches.Name;
         watches.PropertyChanged += OnWatchesSettingsPropertyChanged;
@@ -69,36 +68,6 @@ public sealed partial class OutputPage : Page, IDisposable
         InitializeComponent();
         DataContext = this;
         _Outputs.Loaded += OnOutputsLoaded;
-    }
-
-    [RelayCommand]
-    static async Task OpenWithDefaultAppAsync(OutputViewModel output) {
-        await output.OpenWithDefaultAppAsync();
-    }
-
-    [RelayCommand]
-    static async Task OpenFolderAsync(OutputViewModel output) {
-        await output.OpenFolderAsync();
-    }
-
-    [RelayCommand]
-    static async Task CopyAsync(OutputViewModel output) {
-        await output.CopyAsync();
-    }
-
-    [RelayCommand]
-    static async Task CopyImageAsync(OutputViewModel output) {
-        await output.CopyImageAsync();
-    }
-
-    [RelayCommand]
-    static void CopyPath(OutputViewModel output) {
-        output.CopyPath();
-    }
-
-    [RelayCommand]
-    static void CopyPrompt(OutputViewModel output) {
-        output.CopyPrompt();
     }
 
     [RelayCommand]
@@ -121,7 +90,7 @@ public sealed partial class OutputPage : Page, IDisposable
             Remove(Outputs, e.FullPath);
             if (!File.Exists(e.FullPath)) return;
             _watches.TryGetValue(service.Name, out var watch);
-            await AddAsync(Outputs, service.Name, watch?.IconSource, service.Path, e.FullPath);
+            await AddAsync(Outputs, service.Name, watch, service.Path, e.FullPath);
             if (watch?.Notification ?? false) Notification(service, watch, e.FullPath);
         });
     }
@@ -136,7 +105,7 @@ public sealed partial class OutputPage : Page, IDisposable
             Remove(Outputs, e.OldFullPath);
             if (!File.Exists(e.FullPath)) return;
             _watches.TryGetValue(service.Name, out var watch);
-            await AddAsync(Outputs, service.Name, watch?.IconSource, service.Path, e.FullPath);
+            await AddAsync(Outputs, service.Name, watch, service.Path, e.FullPath);
             if (watch?.Notification ?? false) Notification(service, watch, e.FullPath);
         });
     }
@@ -163,12 +132,14 @@ public sealed partial class OutputPage : Page, IDisposable
     }
 
     void OnWatchesSettingsPropertyChanged(object sender, PropertyChangedEventArgs e) {
-        if (sender is not WatchesSettingViewModel watches) return;
+        if (sender is not WatchesSettingsViewModel watches) return;
         if (e.PropertyName == nameof(watches.Icon)) {
             Icon = watches.Icon;
         } else if (e.PropertyName == nameof(watches.Name)) {
             Title = watches.Name;
-            _watches.Values.Where(w => w.Notification).ForEach(StoreIcon);
+            _watches.Values.Where(w => w.Notification)
+                           .Where(w => w.IconSource != null)
+                           .ForEach(StoreIcon);
         }
     }
 
@@ -185,19 +156,23 @@ public sealed partial class OutputPage : Page, IDisposable
             service.Path = watch.Path;
         } else if (e.PropertyName == nameof(watch.Filters)) {
             service.Filters = watch.Filters;
+        } else if (e.PropertyName == nameof(watch.Format)) {
+            service.Format = watch.Format;
         } else if (e.PropertyName == nameof(watch.Notification)) {
-            if (watch.Notification) StoreIcon(watch);
+            if (watch.Notification && watch.IconSource != null) StoreIcon(watch);
         }
     }
 
     void AddWatch(WatchSettingsViewModel watch) {
-        var service = new FileSystemWatchService(watch.Name, watch.Path, watch.Filters);
+        var service = new FileSystemWatchService(watch.Name, watch.Path, watch.Filters) {
+            Format = watch.Format
+        };
         service.Changed += OnChanged;
         service.Deleted += OnDeleted;
         service.Renamed += OnRenamed;
         _services.Add(service);
         watch.PropertyChanged += OnWatchSettingsPropertyChanged;
-        if (watch.Notification) StoreIcon(watch);
+        if (watch.Notification && watch.IconSource != null) StoreIcon(watch);
         _watches.Add(watch.Name, watch);
     }
 
@@ -223,9 +198,9 @@ public sealed partial class OutputPage : Page, IDisposable
 
     static OutputPage() {
         _applicationData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        var romingFolder = System.IO.Path.Combine(_applicationData, nameof(OutputBrowser));
-        if (!Directory.Exists(romingFolder)) {
-            Directory.CreateDirectory(romingFolder);
+        var roamingFolder = System.IO.Path.Combine(_applicationData, nameof(OutputBrowser));
+        if (!Directory.Exists(roamingFolder)) {
+            Directory.CreateDirectory(roamingFolder);
         }
     }
 
@@ -242,8 +217,8 @@ public sealed partial class OutputPage : Page, IDisposable
         if (viewModel != null) outputs.Remove(viewModel);
     }
 
-    static async Task AddAsync(ObservableCollection<OutputViewModel> outputs, string sender, ImageSource icon, string basePath, string fullPath) {
-        var output = new OutputViewModel(sender, icon, basePath, fullPath);
+    static async Task AddAsync(ObservableCollection<OutputViewModel> outputs, string sender, WatchSettingsViewModel watch, string basePath, string fullPath) {
+        var output = new OutputViewModel(sender, watch?.IconSource, watch?.Format, basePath, fullPath);
         var initialized = await output.InitializeAsync();
         if (initialized) outputs.Add(output);
     }
@@ -255,9 +230,16 @@ public sealed partial class OutputPage : Page, IDisposable
             ? new Uri($"file://{_applicationData}/{nameof(OutputBrowser)}/{watch.IconFileName}")
             : new Uri($"ms-appx:///Assets/Titles/TitlebarLogo.png");
         var imageUri = new Uri($"file://{fullPath}");
+
+        var message = string.IsNullOrWhiteSpace(watch.Format)
+            ? relativePath
+            : watch.Format
+                .Replace("{{name}}", System.IO.Path.GetFileName(fullPath))
+                .Replace("{{path}}", relativePath);
+
         builder.SetAppLogoOverride(iconUri)
                .AddText(service.Name)
-               .AddText(relativePath)
+               .AddText(message)
                .SetInlineImage(imageUri);
         AppNotificationManager.Default.Show(builder.BuildNotification());
     }
