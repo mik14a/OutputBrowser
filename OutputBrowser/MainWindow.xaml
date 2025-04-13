@@ -9,8 +9,4 @@
     xmlns:pages="using:OutputBrowser.Pages"
     xmlns:windowex="using:WinUIEx"
     Title="OutputBrowser"
-    mc:Ignorable="d">
-    <Window.SystemBackdrop>
-        <MicaBackdrop Kind="BaseAlt" />
-    </Window.SystemBackdrop>
-</windowex:WindowEx>
+    mc:Ignorable="d" />

@@ -81,6 +81,6 @@ public sealed partial class WatchSettingsDialog : ContentDialog
             Model.Path = folder.Path;
         }
     }
-    
+
     static readonly ResourceLoader _resourceLoader = new();
 }

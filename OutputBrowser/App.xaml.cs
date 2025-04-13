@@ -9,7 +9,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Media;
 using Microsoft.Windows.AppNotifications;
 using OutputBrowser.Helpers;
 using OutputBrowser.ViewModels;
@@ -63,18 +62,12 @@ public partial class App : Application
     }
 
     public void SetElementTheme(ElementTheme value) {
-        if (MainWindow.Content is FrameworkElement root) {
-            root.RequestedTheme = value;
-        }
+        _window.SetTheme(value);
+        WindowHelper.UpdateTitleBar(value);
     }
 
     public void SetSystemBackdrop(Controls.SystemBackdrop value) {
-        MainWindow.SystemBackdrop = value switch {
-            Controls.SystemBackdrop.Mica => new MicaBackdrop { Kind = Microsoft.UI.Composition.SystemBackdrops.MicaKind.Base },
-            Controls.SystemBackdrop.MicaAlt => new MicaBackdrop { Kind = Microsoft.UI.Composition.SystemBackdrops.MicaKind.BaseAlt },
-            Controls.SystemBackdrop.Acrylic => new DesktopAcrylicBackdrop(),
-            _ => new MicaBackdrop { Kind = Microsoft.UI.Composition.SystemBackdrops.MicaKind.Base }
-        };
+        _window.SetBackdrop(value);
     }
 
     /// <summary>

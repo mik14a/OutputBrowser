@@ -28,6 +28,7 @@ public sealed partial class SettingPage : Page
         new(SystemBackdrop.Mica, "マイカ"),
         new(SystemBackdrop.MicaAlt, "マイカオルタナティブ"),
         new(SystemBackdrop.Acrylic, "アクリル"),
+        new(SystemBackdrop.AcrylicCustom, "アクリル(カスタム)"),
     ];
 
     public SettingViewModel Model => _model;

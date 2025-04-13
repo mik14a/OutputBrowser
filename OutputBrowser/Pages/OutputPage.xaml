@@ -157,7 +157,7 @@
             </GridView.ItemsPanel>
         </GridView>
 
-        <CommandBar Background="{StaticResource ControlOnImageFillColorDefault}">
+        <CommandBar Background="{StaticResource AcrylicBackgroundFillColorDefaultBrush}">
             <CommandBar.Content>
                 <StackPanel
                     Margin="8,14"
