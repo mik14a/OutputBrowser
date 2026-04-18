@@ -111,12 +111,19 @@ public sealed partial class OutputPage : Page, IDisposable
     }
 
     void OnPageLoaded(object sender, RoutedEventArgs e) {
+        _Outputs.PreviewKeyDown += OnOutputsPreviewKeyDown;
         _Outputs.Focus(FocusState.Programmatic);
         IsScrolledAway = ScrolledAway(_Outputs.GetScrollViewer());
     }
 
     void OnOutputsLoaded(object sender, RoutedEventArgs e) {
         ((GridView)sender).GetScrollViewer().ViewChanged += OnOutputsViewChanged;
+    }
+
+    private void OnOutputsPreviewKeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e) {
+        if (e.Key != VirtualKey.Space) return;
+        ((GridView)sender).ScrollToBottom(disableAnimation: false);
+        e.Handled = true;
     }
 
     void OnOutputsViewChanged(object sender, ScrollViewerViewChangedEventArgs e) {
