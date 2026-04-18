@@ -17,6 +17,18 @@ namespace OutputBrowser.ViewModels;
 
 public partial class OutputViewModel : ObservableRecipient
 {
+    /// <summary>
+    /// WIC/PNG metadata query paths tried in order until non-empty embedded text is found
+    /// (Automatic1111 <c>parameters</c>, ComfyUI <c>prompt</c>/<c>workflow</c>, optionally compressed <c>zTXt</c>).
+    /// </summary>
+    static readonly string[] PngEmbeddedTextMetadataQueryFallbackOrder = [
+        "/tEXt/{str=parameters}",
+        "/tEXt/{str=prompt}",
+        "/zTXt/{str=prompt}",
+        "/tEXt/{str=workflow}",
+        "/zTXt/{str=workflow}",
+    ];
+
     public string Sender { get; }
     public ImageSource Icon { get; }
     public string ImagePath { get; }
@@ -83,11 +95,22 @@ public partial class OutputViewModel : ObservableRecipient
             var bitmap = new BitmapImage();
             await bitmap.SetSourceAsync(stream);
             Image = bitmap;
+            stream.Seek(0);
             var decoder = await BitmapDecoder.CreateAsync(stream);
-            const string Parameters = "/tEXt/{str=parameters}";
-            var retrieveProperties = await decoder.BitmapProperties.GetPropertiesAsync([Parameters]);
-            retrieveProperties.TryGetValue(Parameters, out var parameters);
-            ContactInfo = (string)parameters?.Value;
+            ContactInfo = null;
+            foreach (var query in PngEmbeddedTextMetadataQueryFallbackOrder) {
+                try {
+                    var retrieved = await decoder.BitmapProperties.GetPropertiesAsync([query]);
+                    if (!retrieved.TryGetValue(query, out var value) || value.Value is not string text
+                        || string.IsNullOrWhiteSpace(text)) {
+                        continue;
+                    }
+                    ContactInfo = text;
+                    break;
+                } catch (Exception ex) {
+                    Debug.WriteLine($"PNG metadata query skipped ({query}): {ex.Message}");
+                }
+            }
             return true;
         } catch (FileNotFoundException ex) {
             Debug.WriteLine(ex.Message);  // File deleted in operating

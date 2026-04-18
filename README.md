@@ -5,6 +5,11 @@ OutputBrowserは、画像ファイルの出力を監視・閲覧するための�
 
 ![image](https://github.com/user-attachments/assets/f988b360-4375-4821-a9f7-5349fd977c1f)
 
+## 最新アップデート (2026/04/18) 🎉
+
+### 新機能
+- PNG に埋め込まれた生成情報の読み取りを拡張（ComfyUI は JSON になることがあります）
+
 ## 最新アップデート (2025/04/20) 🎉
 
 ### 新機能
