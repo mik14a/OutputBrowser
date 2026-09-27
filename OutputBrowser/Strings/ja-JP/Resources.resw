@@ -134,6 +134,8 @@
   <data name="ThemeSettingsSettingsCard.Description" xml:space="preserve"><value>アプリケーションのテーマを選択してください</value></data>
   <data name="BackdropSettingsSettingsCard.Header" xml:space="preserve"><value>背景エフェクト</value></data>
   <data name="BackdropSettingsSettingsCard.Description" xml:space="preserve"><value>アプリケーションの背景エフェクトを選択してください</value></data>
+  <data name="ViewerSettingsSettingsCard.Header" xml:space="preserve"><value>ビューアー</value></data>
+  <data name="ViewerSettingsSettingsCard.Description" xml:space="preserve"><value>ファイルを開くときのビューアーを選択してください</value></data>
   <data name="DefaultBrowserSettingsExpander.Header" xml:space="preserve"><value>デフォルトブラウザ</value></data>
   <data name="DefaultBrowserSettingsExpander.Description" xml:space="preserve"><value>デフォルトで表示される出力ブラウザの設定です</value></data>
   <data name="DefaultFolderSettingsCard.Header" xml:space="preserve"><value>フォルダ</value></data>

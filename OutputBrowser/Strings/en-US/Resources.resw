@@ -134,6 +134,8 @@
   <data name="ThemeSettingsSettingsCard.Description" xml:space="preserve"><value>Select the theme for the application</value></data>
   <data name="BackdropSettingsSettingsCard.Header" xml:space="preserve"><value>Backdrop settings</value></data>
   <data name="BackdropSettingsSettingsCard.Description" xml:space="preserve"><value>Select the backdrop for the application</value></data>
+  <data name="ViewerSettingsSettingsCard.Header" xml:space="preserve"><value>Viewer</value></data>
+  <data name="ViewerSettingsSettingsCard.Description" xml:space="preserve"><value>Select the viewer to use when opening files</value></data>
   <data name="DefaultBrowserSettingsExpander.Header" xml:space="preserve"><value>Default browser</value></data>
   <data name="DefaultBrowserSettingsExpander.Description" xml:space="preserve"><value>Default output browser settings</value></data>
   <data name="DefaultFolderSettingsCard.Header" xml:space="preserve"><value>Folder</value></data>

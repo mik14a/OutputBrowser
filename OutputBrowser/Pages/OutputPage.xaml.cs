@@ -90,7 +90,10 @@ public sealed partial class OutputPage : Page, IDisposable
             Remove(Outputs, e.FullPath);
             if (!File.Exists(e.FullPath)) return;
             _watches.TryGetValue(service.Name, out var watch);
-            await AddAsync(Outputs, service.Name, watch, service.Path, e.FullPath);
+            var newOutput = await AddAsync(Outputs, service.Name, watch, service.Path, e.FullPath);
+            if (newOutput != null && !IsScrolledAway) {
+                App.UpdateBuiltInViewerIfOpen(newOutput);
+            }
             if (watch?.Notification ?? false) Notification(service, watch, e.FullPath);
         });
     }
@@ -105,7 +108,10 @@ public sealed partial class OutputPage : Page, IDisposable
             Remove(Outputs, e.OldFullPath);
             if (!File.Exists(e.FullPath)) return;
             _watches.TryGetValue(service.Name, out var watch);
-            await AddAsync(Outputs, service.Name, watch, service.Path, e.FullPath);
+            var newOutput = await AddAsync(Outputs, service.Name, watch, service.Path, e.FullPath);
+            if (newOutput != null && !IsScrolledAway) {
+                App.UpdateBuiltInViewerIfOpen(newOutput);
+            }
             if (watch?.Notification ?? false) Notification(service, watch, e.FullPath);
         });
     }
@@ -224,10 +230,14 @@ public sealed partial class OutputPage : Page, IDisposable
         if (viewModel != null) outputs.Remove(viewModel);
     }
 
-    static async Task AddAsync(ObservableCollection<OutputViewModel> outputs, string sender, WatchSettingsViewModel watch, string basePath, string fullPath) {
+    static async Task<OutputViewModel> AddAsync(ObservableCollection<OutputViewModel> outputs, string sender, WatchSettingsViewModel watch, string basePath, string fullPath) {
         var output = new OutputViewModel(sender, watch?.IconSource, watch?.Format, basePath, fullPath);
         var initialized = await output.InitializeAsync();
-        if (initialized) outputs.Add(output);
+        if (initialized) {
+            outputs.Add(output);
+            return output;
+        }
+        return null;
     }
 
     static void Notification(FileSystemWatchService service, WatchSettingsViewModel watch, string fullPath) {

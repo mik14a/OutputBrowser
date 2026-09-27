@@ -10,9 +10,12 @@ using Microsoft.Extensions.Options;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.Windows.AppNotifications;
+using OutputBrowser.Browser;
+using OutputBrowser.Controls;
 using OutputBrowser.Helpers;
 using OutputBrowser.ViewModels;
 using WinUIEx;
+using Windows.Storage;
 
 namespace OutputBrowser;
 
@@ -31,6 +34,60 @@ public partial class App : Application
         return services.GetService<T>() is T service
             ? service
             : throw new ArgumentException($"{typeof(T)} needs to be registered in ConfigureServices within App.xaml.cs.");
+    }
+
+    public static async Task OpenOutputAsync(OutputViewModel output) {
+        if (output == null) return;
+        var settings = GetService<IOptions<Models.OutputBrowserSettings>>().Value;
+        var viewer = Enum.TryParse<Models.ViewerType>(settings.Viewer, out var v) ? v : Models.ViewerType.BuiltIn;
+
+        if (viewer == Models.ViewerType.BuiltIn) {
+            ShowInBuiltInViewer(output);
+        } else {
+            try {
+                var imageFile = await StorageFile.GetFileFromPathAsync(output.ImagePath);
+                await Windows.System.Launcher.LaunchFileAsync(imageFile);
+            } catch (Exception ex) {
+                System.Diagnostics.Debug.WriteLine($"Failed to launch external viewer: {ex.Message}");
+            }
+        }
+    }
+
+    public static void ShowInBuiltInViewer(OutputViewModel output) {
+        if (output == null) return;
+
+        var settings = GetService<IOptions<Models.OutputBrowserSettings>>().Value;
+        var viewer = Enum.TryParse<Models.ViewerType>(settings.Viewer, out var v) ? v : Models.ViewerType.BuiltIn;
+        if (viewer != Models.ViewerType.BuiltIn) return;  // respect current setting
+
+        Current.EnsureImageBrowserWindow();
+        Current._imageBrowserWindow!.SetOutput(output);
+        Current._imageBrowserWindow.Activate();
+    }
+
+    /// <summary>
+    /// Only updates the built-in viewer if it is already open.
+    /// Does NOT create or activate the window if the user hasn't opened it.
+    /// Used for scroll-follow mode auto-update.
+    /// </summary>
+    public static void UpdateBuiltInViewerIfOpen(OutputViewModel output) {
+        if (output == null) return;
+        if (Current._imageBrowserWindow == null) return;   // key: only when already open
+
+        var settings = GetService<IOptions<Models.OutputBrowserSettings>>().Value;
+        var viewer = Enum.TryParse<Models.ViewerType>(settings.Viewer, out var v) ? v : Models.ViewerType.BuiltIn;
+        if (viewer != Models.ViewerType.BuiltIn) return;
+
+        Current._imageBrowserWindow.SetOutput(output);
+    }
+
+    void EnsureImageBrowserWindow() {
+        if (_imageBrowserWindow != null) return;
+
+        _imageBrowserWindow = new ImageBrowserWindow();
+        _imageBrowserWindow.Closed += (_, _) => {
+            _imageBrowserWindow = null;
+        };
     }
 
     public async Task SaveSettingsAsync() {
@@ -139,6 +196,7 @@ public partial class App : Application
     readonly IHost _host;
 
     MainWindow _window;
+    ImageBrowserWindow _imageBrowserWindow;
 
     public static readonly string ExceptionFileFormat = "OutputBrowser.UnhandledException.{0}.log";
     public static readonly string PersonalDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), nameof(OutputBrowser));

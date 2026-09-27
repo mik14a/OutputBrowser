@@ -7,6 +7,7 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using OutputBrowser.Controls;
+using OutputBrowser.Models;
 using OutputBrowser.ViewModels;
 using Windows.Storage;
 using Windows.System;
@@ -31,6 +32,11 @@ public sealed partial class SettingPage : Page
         new(SystemBackdrop.AcrylicCustom, "アクリル(カスタム)"),
     ];
 
+    public static readonly KeyValuePair<ViewerType, string>[] Viewers = [
+        new(ViewerType.BuiltIn, "内蔵ビューアー"),
+        new(ViewerType.External, "外部ビューアー"),
+    ];
+
     public SettingViewModel Model => _model;
 
     public SettingPage() {
@@ -39,6 +45,7 @@ public sealed partial class SettingPage : Page
         DataContext = this;
         _Themes.SelectedItem = Themes.FirstOrDefault(t => t.Key == Model.Theme);
         _Backdrops.SelectedItem = Backdrops.FirstOrDefault(b => b.Key == Model.Backdrop);
+        _Viewers.SelectedItem = Viewers.FirstOrDefault(v => v.Key == Model.Viewer);
         _model.PropertyChanged += OnModelPropertyChanged;
     }
 

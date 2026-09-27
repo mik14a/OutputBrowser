@@ -11,6 +11,7 @@ public partial class SettingViewModel : ObservableRecipient
 {
     [ObservableProperty] public partial ElementTheme Theme { get; set; }
     [ObservableProperty] public partial Controls.SystemBackdrop Backdrop { get; set; }
+    [ObservableProperty] public partial Models.ViewerType Viewer { get; set; }
 
     public WatchSettingsViewModel Default { get; set; } = new(null);
     public ObservableCollection<WatchesSettingsViewModel> Watches { get; } = [];
@@ -23,6 +24,7 @@ public partial class SettingViewModel : ObservableRecipient
     public void Apply() {
         Theme = Enum.TryParse<ElementTheme>(_settings.Theme, out var theme) ? theme : ElementTheme.Default;
         Backdrop = Enum.TryParse<Controls.SystemBackdrop>(_settings.Backdrop, out var backdrop) ? backdrop : Controls.SystemBackdrop.Mica;
+        Viewer = Enum.TryParse<Models.ViewerType>(_settings.Viewer, out var viewer) ? viewer : Models.ViewerType.BuiltIn;
         Default.Path = _settings.Default.Path;
         Default.Filters = _settings.Default.Filters;
         Default.Format = _settings.Default.Format;
@@ -34,6 +36,7 @@ public partial class SettingViewModel : ObservableRecipient
     public void Update() {
         _settings.Theme = Theme.ToString();
         _settings.Backdrop = Backdrop.ToString();
+        _settings.Viewer = Viewer.ToString();
         _settings.Default.Path = Default.Path;
         _settings.Default.Filters = Default.Filters;
         _settings.Default.Format = Default.Format;

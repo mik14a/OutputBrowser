@@ -47,6 +47,14 @@
                                 SelectedValue="{x:Bind Model.Backdrop, Mode=TwoWay}"
                                 SelectedValuePath="Key" />
                         </toolkit:SettingsCard>
+                        <toolkit:SettingsCard x:Uid="ViewerSettingsSettingsCard" HeaderIcon="{ui:FontIcon Glyph=&#xE722;}">
+                            <ComboBox
+                                x:Name="_Viewers"
+                                DisplayMemberPath="Value"
+                                ItemsSource="{x:Bind local:SettingPage.Viewers}"
+                                SelectedValue="{x:Bind Model.Viewer, Mode=TwoWay}"
+                                SelectedValuePath="Key" />
+                        </toolkit:SettingsCard>
                     </toolkit:SettingsExpander.Items>
                 </toolkit:SettingsExpander>
 

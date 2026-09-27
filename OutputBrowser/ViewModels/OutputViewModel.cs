@@ -124,8 +124,7 @@ public partial class OutputViewModel : ObservableRecipient
 
     [RelayCommand]
     async Task OpenWithDefaultAppAsync() {
-        var imageFile = await StorageFile.GetFileFromPathAsync(ImagePath);
-        await Launcher.LaunchFileAsync(imageFile);
+        await App.OpenOutputAsync(this);
     }
 
     [RelayCommand]
