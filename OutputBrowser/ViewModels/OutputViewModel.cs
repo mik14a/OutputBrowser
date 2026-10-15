@@ -1,4 +1,5 @@
 using System;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -29,6 +30,9 @@ public partial class OutputViewModel : ObservableRecipient
         "/zTXt/{str=workflow}",
     ];
 
+    /// <summary>Gets the collection of outputs that this output belongs to.</summary>
+    public ObservableCollection<OutputViewModel> Outputs { get; }
+
     public string Sender { get; }
     public ImageSource Icon { get; }
     public string ImagePath { get; }
@@ -48,7 +52,8 @@ public partial class OutputViewModel : ObservableRecipient
     [ObservableProperty]
     public partial string ContactInfo { get; set; }
 
-    public OutputViewModel(string sender, ImageSource icon, string format, string basePath, string fullPath) {
+    public OutputViewModel(ObservableCollection<OutputViewModel> outputs, string sender, ImageSource icon, string format, string basePath, string fullPath) {
+        Outputs = outputs;
         Sender = sender;
         Icon = icon;
         ImagePath = fullPath;

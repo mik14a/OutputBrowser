@@ -11,11 +11,10 @@ using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.Windows.AppNotifications;
 using OutputBrowser.Browser;
-using OutputBrowser.Controls;
 using OutputBrowser.Helpers;
 using OutputBrowser.ViewModels;
-using WinUIEx;
 using Windows.Storage;
+using WinUIEx;
 
 namespace OutputBrowser;
 
@@ -61,7 +60,7 @@ public partial class App : Application
         if (viewer != Models.ViewerType.BuiltIn) return;  // respect current setting
 
         Current.EnsureImageBrowserWindow();
-        Current._imageBrowserWindow!.SetOutput(output);
+        Current._imageBrowserWindow!.ShowAt(output.Outputs, output.Outputs.IndexOf(output));
         Current._imageBrowserWindow.Activate();
     }
 
@@ -78,16 +77,18 @@ public partial class App : Application
         var viewer = Enum.TryParse<Models.ViewerType>(settings.Viewer, out var v) ? v : Models.ViewerType.BuiltIn;
         if (viewer != Models.ViewerType.BuiltIn) return;
 
-        Current._imageBrowserWindow.SetOutput(output);
+        Current._imageBrowserWindow.ShowAt(output.Outputs, output.Outputs.IndexOf(output));
+    }
+
+    public static bool IsAtEndInBuiltInViewer() {
+        return Current._imageBrowserWindow?.IsAtEnd ?? false;
     }
 
     void EnsureImageBrowserWindow() {
         if (_imageBrowserWindow != null) return;
 
         _imageBrowserWindow = new ImageBrowserWindow();
-        _imageBrowserWindow.Closed += (_, _) => {
-            _imageBrowserWindow = null;
-        };
+        _imageBrowserWindow.Closed += (_, _) => _imageBrowserWindow = null;
     }
 
     public async Task SaveSettingsAsync() {

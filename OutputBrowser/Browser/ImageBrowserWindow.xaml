@@ -11,24 +11,151 @@
     MinHeight="360"
     mc:Ignorable="d">
 
-    <Grid x:Name="_Root">
+    <Grid>
+        <Grid.ContextFlyout>
+            <CommandBarFlyout>
+                <AppBarButton
+                    x:Uid="OpenFileButton"
+                    Command="{x:Bind Model.OpenWithDefaultAppCommand, Mode=OneWay}"
+                    CommandParameter="{x:Bind Model, Mode=OneWay}"
+                    Icon="OpenFile" />
+                <AppBarButton
+                    x:Uid="OpenFolderButton"
+                    Command="{x:Bind Model.OpenFolderCommand, Mode=OneWay}"
+                    CommandParameter="{x:Bind Model, Mode=OneWay}"
+                    Icon="Folder" />
+                <AppBarButton
+                    x:Uid="CopyFileButton"
+                    Command="{x:Bind Model.CopyCommand, Mode=OneWay}"
+                    CommandParameter="{x:Bind Model, Mode=OneWay}"
+                    Icon="Copy" />
+                <AppBarButton
+                    x:Uid="CopyImageButton"
+                    Command="{x:Bind Model.CopyImageCommand, Mode=OneWay}"
+                    CommandParameter="{x:Bind Model, Mode=OneWay}"
+                    Icon="Pictures" />
+                <CommandBarFlyout.SecondaryCommands>
+                    <AppBarButton
+                        x:Uid="CopyPathButton"
+                        Command="{x:Bind Model.CopyPathCommand, Mode=OneWay}"
+                        CommandParameter="{x:Bind Model, Mode=OneWay}"
+                        Icon="Bookmarks" />
+                    <AppBarButton
+                        x:Uid="CopyPromptButton"
+                        Command="{x:Bind Model.CopyPromptCommand, Mode=OneWay}"
+                        CommandParameter="{x:Bind Model, Mode=OneWay}"
+                        Icon="Page2" />
+                    <AppBarToggleButton
+                        x:Uid="ShowPromptButton"
+                        Icon="ContactInfo"
+                        IsChecked="{x:Bind ShowPrompt, Mode=TwoWay}" />
+                    <AppBarToggleButton
+                        x:Uid="ShowNavigationButton"
+                        Icon="Switch"
+                        IsChecked="{x:Bind ShowNavigation, Mode=TwoWay}" />
+                </CommandBarFlyout.SecondaryCommands>
+            </CommandBarFlyout>
+        </Grid.ContextFlyout>
+
         <Grid.RowDefinitions>
             <RowDefinition Height="{ThemeResource TitleBarCompactHeight}" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
+
         <Viewbox
             Grid.Row="0"
             Grid.RowSpan="2"
             Stretch="Uniform">
-            <Image Source="{Binding Image}" Stretch="Uniform" />
+            <Image Source="{x:Bind Model.Image, Mode=OneWay}" Stretch="Uniform" />
         </Viewbox>
 
-        <Grid x:Name="_AppTitleBar" Background="{StaticResource ContentDialogLightDismissOverlayBackground}">
+        <Grid Grid.Row="1">
+            <!--  Prompt Text  -->
+            <Border
+                VerticalAlignment="Bottom"
+                Background="{StaticResource ContentDialogLightDismissOverlayBackground}"
+                Visibility="{x:Bind ShowPromptVisibility, Mode=OneWay}">
+                <TextBlock
+                    Margin="{StaticResource ContentDialogPadding}"
+                    Style="{StaticResource BodyTextBlockStyle}"
+                    Text="{x:Bind Model.ContactInfo, Mode=OneWay}"
+                    TextWrapping="Wrap" />
+            </Border>
+
+            <!--  Navigation Buttons  -->
+            <Grid Visibility="{x:Bind ShowNavigationVisibility, Mode=OneWay}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Button
+                    x:Uid="PreviousButton"
+                    Grid.Column="0"
+                    Padding="0,16"
+                    VerticalAlignment="Center"
+                    Command="{x:Bind PreviousCommand}"
+                    CornerRadius="0,4,4,0"
+                    Style="{StaticResource ButtonRevealStyle}">
+                    <FontIcon Margin="0" Glyph="&#xE76B;" />
+                    <Button.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="J" Modifiers="None" />
+                        <KeyboardAccelerator Key="Left" Modifiers="None" />
+                    </Button.KeyboardAccelerators>
+                </Button>
+                <Button
+                    x:Uid="NextButton"
+                    Grid.Column="2"
+                    Padding="0,16"
+                    VerticalAlignment="Center"
+                    Command="{x:Bind NextCommand}"
+                    CornerRadius="4,0,0,4"
+                    Style="{StaticResource ButtonRevealStyle}">
+                    <FontIcon Margin="0" Glyph="&#xE76C;" />
+                    <Button.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="K" Modifiers="None" />
+                        <KeyboardAccelerator Key="Right" Modifiers="None" />
+
+                    </Button.KeyboardAccelerators>
+                </Button>
+
+                <Button
+                    Grid.ColumnSpan="3"
+                    Margin="0"
+                    Padding="0"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Top"
+                    Command="{x:Bind TopCommand}">
+                    <Button.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="Space" Modifiers="Shift" />
+                    </Button.KeyboardAccelerators>
+                </Button>
+
+                <Button
+                    Grid.ColumnSpan="3"
+                    Margin="0"
+                    Padding="0"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Bottom"
+                    Command="{x:Bind BottomCommand}">
+                    <Button.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="Space" Modifiers="None" />
+                    </Button.KeyboardAccelerators>
+                </Button>
+
+            </Grid>
+        </Grid>
+
+        <!--  App Title Bar  -->
+        <Grid
+            x:Name="_AppTitleBar"
+            Background="{StaticResource ContentDialogLightDismissOverlayBackground}"
+            ContextRequested="OnAppTitleBarContextRequested">
             <TextBlock
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
                 Style="{StaticResource CaptionTextBlockStyle}"
-                Text="{Binding DisplayName}" />
+                Text="{x:Bind Model.DisplayName, Mode=OneWay}" />
         </Grid>
 
     </Grid>

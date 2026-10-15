@@ -24,8 +24,12 @@ if exist %APP_DIR%\..\OutputBrowser.7z (
     del %APP_DIR%\..\OutputBrowser.7z
 )
 
+::: Create a 7z archive of the app
+::: Self-contained 2.x does not copy Microsoft.WindowsAppRuntime.Insights.Resource.dll.
+::: See OutputBrowser.csproj for more details.
 start 7za a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on -mmt=%NUMBER_OF_PROCESSORS% ^
  %APP_DIR%\..\OutputBrowser.7z ^
- %APP_DIR%\OutputBrowser.exe
+ %APP_DIR%\OutputBrowser.exe ^
+ %APP_DIR%\Microsoft.WindowsAppRuntime.Insights.Resource.dll
 
 endlocal

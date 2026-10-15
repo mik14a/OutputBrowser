@@ -90,8 +90,9 @@ public sealed partial class OutputPage : Page, IDisposable
             Remove(Outputs, e.FullPath);
             if (!File.Exists(e.FullPath)) return;
             _watches.TryGetValue(service.Name, out var watch);
+            var isAtEnd = App.IsAtEndInBuiltInViewer();
             var newOutput = await AddAsync(Outputs, service.Name, watch, service.Path, e.FullPath);
-            if (newOutput != null && !IsScrolledAway) {
+            if (newOutput != null && !IsScrolledAway && isAtEnd) {
                 App.UpdateBuiltInViewerIfOpen(newOutput);
             }
             if (watch?.Notification ?? false) Notification(service, watch, e.FullPath);
@@ -108,8 +109,9 @@ public sealed partial class OutputPage : Page, IDisposable
             Remove(Outputs, e.OldFullPath);
             if (!File.Exists(e.FullPath)) return;
             _watches.TryGetValue(service.Name, out var watch);
+            var isAtEnd = App.IsAtEndInBuiltInViewer();
             var newOutput = await AddAsync(Outputs, service.Name, watch, service.Path, e.FullPath);
-            if (newOutput != null && !IsScrolledAway) {
+            if (newOutput != null && !IsScrolledAway && isAtEnd) {
                 App.UpdateBuiltInViewerIfOpen(newOutput);
             }
             if (watch?.Notification ?? false) Notification(service, watch, e.FullPath);
@@ -126,7 +128,7 @@ public sealed partial class OutputPage : Page, IDisposable
         ((GridView)sender).GetScrollViewer().ViewChanged += OnOutputsViewChanged;
     }
 
-    private void OnOutputsPreviewKeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e) {
+    void OnOutputsPreviewKeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e) {
         if (e.Key != VirtualKey.Space) return;
         ((GridView)sender).ScrollToBottom(disableAnimation: false);
         e.Handled = true;
@@ -231,7 +233,7 @@ public sealed partial class OutputPage : Page, IDisposable
     }
 
     static async Task<OutputViewModel> AddAsync(ObservableCollection<OutputViewModel> outputs, string sender, WatchSettingsViewModel watch, string basePath, string fullPath) {
-        var output = new OutputViewModel(sender, watch?.IconSource, watch?.Format, basePath, fullPath);
+        var output = new OutputViewModel(outputs, sender, watch?.IconSource, watch?.Format, basePath, fullPath);
         var initialized = await output.InitializeAsync();
         if (initialized) {
             outputs.Add(output);

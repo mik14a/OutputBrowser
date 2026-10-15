@@ -126,6 +126,9 @@
   <data name="CopyPathButton.Label" xml:space="preserve"><value>Copy path</value></data>
   <data name="CopyPromptButton.Label" xml:space="preserve"><value>Copy prompt</value></data>
   <data name="ShowPromptButton.Label" xml:space="preserve"><value>Show prompt</value></data>
+  <data name="ShowNavigationButton.Label" xml:space="preserve"><value>Previous and next</value></data>
+  <data name="PreviousButton.ToolTipService.ToolTip" xml:space="preserve"><value>Previous image (←, J)&#10;First image (Shift+Space)</value></data>
+  <data name="NextButton.ToolTipService.ToolTip" xml:space="preserve"><value>Next image (→, K)&#10;Last image (Space)</value></data>
 
   <!-- Settings page -->
   <data name="ApplicationSettingsSettingsExpander.Header" xml:space="preserve"><value>Application settings</value></data>

@@ -126,6 +126,9 @@
   <data name="CopyPathButton.Label" xml:space="preserve"><value>パスのコピー</value></data>
   <data name="CopyPromptButton.Label" xml:space="preserve"><value>プロンプトのコピー</value></data>
   <data name="ShowPromptButton.Label" xml:space="preserve"><value>プロンプトの表示</value></data>
+  <data name="ShowNavigationButton.Label" xml:space="preserve"><value>前後の画像</value></data>
+  <data name="PreviousButton.ToolTipService.ToolTip" xml:space="preserve"><value>前の画像 (←, J)&#10;先頭の画像 (Shift+Space)</value></data>
+  <data name="NextButton.ToolTipService.ToolTip" xml:space="preserve"><value>次の画像 (→, K)&#10;末尾の画像 (Space)</value></data>
 
   <!-- Settings page -->
   <data name="ApplicationSettingsSettingsExpander.Header" xml:space="preserve"><value>アプリケーションの設定</value></data>
