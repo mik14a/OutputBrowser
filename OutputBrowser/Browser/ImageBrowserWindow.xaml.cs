@@ -80,6 +80,24 @@ public sealed partial class ImageBrowserWindow : WindowEx
         e.Handled = true;
     }
 
+    void OnPointerWheelChanged(object sender, PointerRoutedEventArgs e) {
+        var properties = e.GetCurrentPoint((UIElement)sender).Properties;
+        if (properties.IsHorizontalMouseWheel) return;
+
+        var delta = properties.MouseWheelDelta;
+        if (0 < delta && CanPrevious)
+            ShowAt(Index - 1);
+        else if (delta < 0 && CanNext)
+            ShowAt(Index + 1);
+
+        e.Handled = true;
+    }
+
+    void OnOutputsChanged(object sender, NotifyCollectionChangedEventArgs e) {
+        Index = Model == null || Outputs == null ? -1 : Outputs.IndexOf(Model);
+        NotifyNavigation();
+    }
+
     void ShowAt(int index) {
         if (Outputs == null) throw new InvalidOperationException("Outputs is null.");
         if (index < 0 || Outputs.Count <= index) throw new ArgumentOutOfRangeException(nameof(index));
@@ -87,11 +105,6 @@ public sealed partial class ImageBrowserWindow : WindowEx
         Index = index;
         Model = Outputs.ElementAt(index);
         Title = Model.DisplayName ?? nameof(OutputBrowser);
-        NotifyNavigation();
-    }
-
-    void OnOutputsChanged(object sender, NotifyCollectionChangedEventArgs e) {
-        Index = Model == null || Outputs == null ? -1 : Outputs.IndexOf(Model);
         NotifyNavigation();
     }
 
