@@ -59,6 +59,7 @@ public sealed partial class SettingPage : Page
     async Task SaveAsync() {
         _model.Update();
         await App.Current.SaveSettingsAsync();
+        App.Current.Shell.ReturnToPageBeforeSettings();
     }
 
     [RelayCommand]

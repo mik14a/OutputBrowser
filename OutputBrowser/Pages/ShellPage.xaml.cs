@@ -30,10 +30,11 @@ public sealed partial class ShellPage : Page
     }
 
     void ShellPageLoaded(object sender, RoutedEventArgs e) {
-
-        var defaultWatched = new WatchesSettingsViewModel(null, new WatchesSettings {
-            Icon = "Accept", Name = _resourceLoader.GetString("OutputBrowserNavigationViewItem/Content"),
-        }) {
+        var watchesSettings = new WatchesSettings {
+            Icon = "Accept",
+            Name = _resourceLoader.GetString("OutputBrowserNavigationViewItem/Content"),
+        };
+        var defaultWatched = new WatchesSettingsViewModel(null, watchesSettings) {
             Page = new OutputPage(_settings.Default)
         };
         Watches.Add(defaultWatched);
@@ -55,13 +56,22 @@ public sealed partial class ShellPage : Page
         }
     }
 
+    public void ReturnToPageBeforeSettings() {
+        var page = _pageBeforeSettings;
+        _ContentFrame.BackStack.Clear();
+        _ContentFrame.ForwardStack.Clear();
+        _NavigationView.SelectedItem = page;
+        _ContentFrame.Content = page.Page;
+    }
+
     void OnNavigationViewSelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args) {
         if (args.SelectedItem == null) {
             return;  // Clear selection.
         } else if (args.IsSettingsSelected) {
             _ContentFrame.Navigate(typeof(SettingPage), args.RecommendedNavigationTransitionInfo);
-        } else if (args.SelectedItem is WatchesSettingsViewModel watches) {
-            _ContentFrame.Content = watches.Page ??= new OutputPage(watches);
+        } else if (args.SelectedItem is WatchesSettingsViewModel watchesSettings) {
+            _pageBeforeSettings = watchesSettings;
+            _ContentFrame.Content = watchesSettings.Page ??= new OutputPage(watchesSettings);
         }
     }
 
@@ -69,13 +79,20 @@ public sealed partial class ShellPage : Page
         if (e.Action == NotifyCollectionChangedAction.Add) {
             e.NewItems.OfType<WatchesSettingsViewModel>().ForEach(Watches.Add);
         } else if (e.Action == NotifyCollectionChangedAction.Remove) {
-            e.OldItems.OfType<WatchesSettingsViewModel>().ForEach(watches => Watches.Remove(watches));
+            e.OldItems.OfType<WatchesSettingsViewModel>().ForEach(watches => {
+                Watches.Remove(watches);
+                if (ReferenceEquals(_pageBeforeSettings, watches)) {
+                    _pageBeforeSettings = Watches.First();
+                }
+            });
         }
     }
 
     void OnAlwaysOnTopClick(object sender, RoutedEventArgs e) {
         App.MainWindow.SetIsAlwaysOnTop(_AlwaysOnTop.IsChecked == true);
     }
+
+    WatchesSettingsViewModel _pageBeforeSettings;  // The page that was selected before navigating to the settings page.
 
     readonly SettingViewModel _settings;
     static readonly ResourceLoader _resourceLoader = new();
