@@ -43,9 +43,8 @@
                             <ComboBox
                                 x:Name="_Backdrops"
                                 DisplayMemberPath="Value"
-                                ItemsSource="{x:Bind local:SettingPage.Backdrops}"
-                                SelectedValue="{x:Bind Model.Backdrop, Mode=TwoWay}"
-                                SelectedValuePath="Key" />
+                                SelectedValuePath="Key"
+                                SelectionChanged="OnBackdropSelectionChanged" />
                         </toolkit:SettingsCard>
                         <toolkit:SettingsCard x:Uid="ViewerSettingsSettingsCard" HeaderIcon="{ui:FontIcon Glyph=&#xE722;}">
                             <ComboBox

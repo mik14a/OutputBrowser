@@ -49,7 +49,7 @@ public sealed partial class ImageBrowserWindow : WindowEx
         if (!ReferenceEquals(Outputs, outputs)) {
             DetachOutputs();
             Outputs = outputs;
-            Outputs?.CollectionChanged += OnOutputsChanged;
+            Outputs.CollectionChanged += OnOutputsChanged;
         }
 
         ShowAt(index);

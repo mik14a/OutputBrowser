@@ -184,4 +184,19 @@
   <!-- WatchSettingsViewModel defaults -->
   <data name="WatchSettingsViewModel.DefaultName" xml:space="preserve"><value>New Watch</value></data>
 
+  <!-- ElementTheme -->
+  <data name="ElementTheme.Default" xml:space="preserve"><value>System</value></data>
+  <data name="ElementTheme.Light" xml:space="preserve"><value>Light</value></data>
+  <data name="ElementTheme.Dark" xml:space="preserve"><value>Dark</value></data>
+
+  <!-- SystemBackdrop -->
+  <data name="SystemBackdrop.Mica" xml:space="preserve"><value>Mica</value></data>
+  <data name="SystemBackdrop.MicaAlt" xml:space="preserve"><value>Mica Alt</value></data>
+  <data name="SystemBackdrop.Acrylic" xml:space="preserve"><value>Acrylic</value></data>
+  <data name="SystemBackdrop.AcrylicCustom" xml:space="preserve"><value>Acrylic (Custom)</value></data>
+
+  <!-- ViewerType -->
+  <data name="ViewerType.BuiltIn" xml:space="preserve"><value>Built-in viewer</value></data>
+  <data name="ViewerType.External" xml:space="preserve"><value>External viewer</value></data>
+
 </root>

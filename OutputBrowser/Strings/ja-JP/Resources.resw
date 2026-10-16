@@ -184,4 +184,19 @@
   <!-- WatchSettingsViewModel defaults -->
   <data name="WatchSettingsViewModel.DefaultName" xml:space="preserve"><value>新規監視</value></data>
 
+  <!-- ElementTheme -->
+  <data name="ElementTheme.Default" xml:space="preserve"><value>システム</value></data>
+  <data name="ElementTheme.Light" xml:space="preserve"><value>ライト</value></data>
+  <data name="ElementTheme.Dark" xml:space="preserve"><value>ダーク</value></data>
+
+  <!-- SystemBackdrop -->
+  <data name="SystemBackdrop.Mica" xml:space="preserve"><value>マイカ</value></data>
+  <data name="SystemBackdrop.MicaAlt" xml:space="preserve"><value>マイカオルタナティブ</value></data>
+  <data name="SystemBackdrop.Acrylic" xml:space="preserve"><value>アクリル</value></data>
+  <data name="SystemBackdrop.AcrylicCustom" xml:space="preserve"><value>アクリル(カスタム)</value></data>
+
+  <!-- ViewerType -->
+  <data name="ViewerType.BuiltIn" xml:space="preserve"><value>内蔵ビューアー</value></data>
+  <data name="ViewerType.External" xml:space="preserve"><value>外部ビューアー</value></data>
+
 </root>
